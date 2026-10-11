@@ -1,0 +1,62 @@
+# robots.txt —— MRS-EV 太极模型数字讲解站
+#
+# 立场：K 层的内容本就是给 AI 读的（被调用即存在），
+# 所以这里对 AI 爬虫全量放行，包括对结构化索引 /k/ 的抓取。
+#
+# 背景（2026-10-06 核实）：
+#   llms.txt 在 AI 编程工具（Cursor / Claude Code / Windsurf / Cline）里确实被读，
+#   但主流 AI 搜索爬虫（GPTBot / ClaudeBot / PerplexityBot / Google-Extended）
+#   实测基本绕过 llms.txt 直接抓 HTML；Google 明确不支持该文件。
+#   —— 所以真正的发现层在这里：HTML + /k/index.json + 本文件。
+#
+# 详见 K 资产：kpub-discovery-layer-gap
+
+User-agent: *
+Allow: /
+
+# ---- AI 训练与检索爬虫（显式列出，避免被误判为通用 UA 而走默认规则）----
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+# ---- 明确指出机器索引入口（这些路径是给工具链拉取的，不是给人翻的）----
+# /k/index.json  结构化资产索引（含 tags / entities / terms / freshness 四张反查表）
+# /k/llms.txt    AI 可发现清单（全量分章切片）
+# /llms.txt      同上，站点根路径
+
+Sitemap: https://taiji.zheng-he.top/sitemap.xml
