@@ -60,3 +60,6 @@ Allow: /
 # /llms.txt      同上，站点根路径
 
 Sitemap: https://taiji.zheng-he.top/sitemap.xml
+
+# 源码已入库：github.com/batcatchina/taiji-site
+# 本仓库起于 2026-10-11 —— 站点源码与线上同步，Vercel 自动部署。
