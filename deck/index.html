@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>人工智能实践应用 · 从会用 AI 到会造 Agent</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#111a33; --card:#16203c; --tx:#e8eefc; --mut:#9db0d4;
+  --acc:#22d3ee; --acc2:#a78bfa; --warn:#fbbf24; --line:rgba(255,255,255,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(1100px 700px at 15% -10%,#1a2450 0%,var(--bg) 55%) fixed;
+  color:var(--tx);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  overflow:hidden;-webkit-text-size-adjust:100%;
+}
+.deck{position:relative;height:100vh;height:100dvh}
+.slide{
+  display:none;position:absolute;inset:0;padding:48px 64px 88px;
+  flex-direction:column;justify-content:center;max-width:1360px;margin:0 auto;
+  animation:fade .3s ease;
+}
+.slide.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* 层级：小标签 → 标题 → 内容 → 【一句话重点】 */
+.kicker{font-size:12px;letter-spacing:.2em;color:var(--acc);font-weight:700;margin-bottom:10px}
+h1{font-size:clamp(30px,5vw,58px);line-height:1.18;font-weight:800}
+h2{font-size:clamp(24px,3.2vw,38px);line-height:1.22;font-weight:800}
+.sub{color:var(--mut);font-size:clamp(14px,1.4vw,18px);margin-top:12px;line-height:1.7;max-width:940px}
+.grad{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* 一句话重点：每页唯一，视觉最跳 */
+.key{margin-top:18px;padding:13px 18px;border-radius:11px;font-size:clamp(14px,1.5vw,17px);line-height:1.65;
+  background:linear-gradient(90deg,rgba(34,211,238,.15),rgba(167,139,250,.06));
+  border-left:3px solid var(--acc)}
+.key b{color:var(--acc)}
+
+/* 卡片 */
+.grid{display:grid;gap:16px;margin-top:20px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+  border-radius:14px;padding:18px 20px}
+.card h3{font-size:16px;margin-bottom:7px;display:flex;align-items:center;gap:9px}
+.card p{color:var(--mut);font-size:14px;line-height:1.65}
+.num{width:24px;height:24px;flex:0 0 24px;border-radius:7px;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#06121f;font-weight:800;font-size:12px;display:grid;place-items:center}
+
+/* 流程 */
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.node{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+  border-radius:11px;padding:12px 15px;font-size:14px;font-weight:600}
+.node.hl{border-color:var(--acc);color:var(--acc)}
+.arw{color:var(--acc);font-size:18px;font-weight:700}
+
+/* 阶梯（代替表格，手机友好） */
+.ladder{display:grid;gap:8px;margin-top:18px;max-width:900px}
+.rung{display:flex;gap:16px;align-items:baseline;padding:11px 16px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.rung .add{flex:0 0 104px;font-weight:800}
+.rung .cap{color:var(--mut);font-size:14px}
+.rung.hl{background:rgba(34,211,238,.12);border-color:var(--acc)}
+.rung.hl .add{color:var(--acc)}
+.rung.hl .cap{color:var(--tx)}
+
+/* 对照表（四代 × 炼化/流通/产品/收租） */
+.ttable{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px}
+.ttable th,.ttable td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.ttable thead th{color:var(--acc);font-size:12px;letter-spacing:.08em;font-weight:700;
+  border-bottom:1px solid rgba(34,211,238,.35);white-space:nowrap}
+.ttable tbody tr:last-child td{border-bottom:none}
+.ttable tbody tr.hl{background:rgba(34,211,238,.10)}
+.ttable tbody tr.hl td:first-child{color:var(--acc);font-weight:800}
+.ttable tbody tr.hl td{color:var(--tx)}
+.ttable td:first-child{font-weight:700;white-space:nowrap}
+.ttable td{color:var(--mut)}
+.ttable .rent{color:var(--warn);font-weight:700}
+
+/* 短语列表 */
+ul{list-style:none;margin-top:16px;display:grid;gap:10px}
+li{color:var(--mut);font-size:14.5px;line-height:1.6;padding-left:22px;position:relative}
+li::before{content:"▸";position:absolute;left:0;color:var(--acc);font-weight:700}
+li strong{color:var(--tx)}
+
+.tag{display:inline-block;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;
+  background:rgba(34,211,238,.12);color:var(--acc);border:1px solid rgba(34,211,238,.3)}
+.tag.p{background:rgba(167,139,250,.12);color:var(--acc2);border-color:rgba(167,139,250,.3)}
+
+/* 太极 ⇄ 点圆 */
+.twoview{display:flex;align-items:center;gap:18px;margin-top:14px}
+.view{flex:1 1 0;background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+  border-radius:14px;padding:13px 14px 11px}
+.vtitle{font-size:14px;font-weight:800;text-align:center;margin-bottom:7px}
+.vtitle span{color:var(--mut);font-weight:500;font-size:11.5px;margin-left:5px}
+.tj{width:100%;max-width:320px;height:auto;display:block;margin:0 auto}
+.pc{position:relative;width:190px;height:190px;margin:8px auto 2px}
+.pc .ring{position:absolute;inset:0;border:1.5px dashed rgba(167,139,250,.55);border-radius:50%}
+.pc .dot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:94px;height:94px;
+  border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;
+  color:#06121f;font-weight:800;font-size:22px;box-shadow:0 0 34px rgba(34,211,238,.3)}
+.vcap{text-align:center;font-size:11.5px;color:var(--mut);margin-top:9px;line-height:1.6}
+.vcap b{color:var(--tx)}
+.mid{flex:0 0 auto;text-align:center;color:var(--acc);font-size:24px;font-weight:800}
+.mid span{display:block;font-size:11px;color:var(--mut);font-weight:600;margin-top:2px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:center}
+.lg{font-size:11.5px;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.05);
+  border:1px solid var(--line);color:var(--mut)}
+.lg b{color:var(--tx)}
+.note{text-align:center;font-size:12px;color:var(--mut);margin-top:9px}
+
+/* 控件 */
+.ctrl{position:fixed;bottom:18px;right:18px;display:flex;gap:9px;z-index:50}
+.btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(22,32,60,.9);
+  color:var(--tx);font-size:17px;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(8px);
+  text-decoration:none}
+.btn:active{border-color:var(--acc);color:var(--acc)}
+.pg{position:fixed;bottom:20px;left:18px;color:var(--mut);font-size:12px;z-index:50}
+.bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--acc2));
+  transition:width .3s ease;z-index:60}
+.tip{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);color:#5f7a9e;font-size:12px;z-index:40}
+
+.crumb{position:fixed;top:16px;right:22px;z-index:55;font-size:13px;color:var(--mut);
+  letter-spacing:.02em;display:flex;align-items:center;gap:8px;pointer-events:auto}
+.crumb a{color:var(--mut);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.16);
+  padding-bottom:1px;transition:color .2s,border-color .2s}
+.crumb a:hover{color:var(--acc);border-color:var(--acc)}
+.crumb .sep{color:#4a5f80}
+.crumb .cur{color:var(--acc);font-weight:600}
+.ovw{position:fixed;inset:0;background:rgba(6,10,22,.97);z-index:100;display:none;
+  padding:56px 40px;overflow:auto;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-content:start}
+.ovw.on{display:grid}
+.ovw .mini{border:1px solid var(--line);border-radius:11px;padding:14px;cursor:pointer;background:var(--card)}
+.ovw .mini.cur{border-color:var(--acc)}
+.ovw .mini b{display:block;font-size:13.5px;margin-bottom:5px}
+.ovw .mini span{color:var(--mut);font-size:11.5px}
+
+/* ============ 手机适配 ============ */
+@media (max-width:820px){
+  .slide{padding:18px 16px 74px;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .kicker{font-size:10.5px;margin-bottom:7px}
+  h1{font-size:clamp(24px,6.6vw,34px)}
+  h2{font-size:clamp(19px,5.2vw,25px)}
+  .sub{font-size:13.5px;margin-top:9px;line-height:1.65}
+  .grid{gap:10px;margin-top:13px}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .card{padding:13px 14px}
+  .card h3{font-size:14.5px;margin-bottom:5px}
+  .card p{font-size:13px;line-height:1.55}
+  .num{width:21px;height:21px;flex-basis:21px;font-size:11px}
+  .key{margin-top:12px;padding:11px 13px;font-size:13.5px;border-left-width:2.5px}
+  .flow{gap:7px;margin-top:13px}
+  .node{padding:9px 11px;font-size:12.5px}
+  .arw{font-size:14px}
+  .ladder{gap:7px;margin-top:12px}
+  .rung{flex-direction:column;gap:2px;padding:10px 13px}
+  .rung .add{flex:none;font-size:14px}
+  .rung .cap{font-size:12.5px}
+  ul{gap:8px;margin-top:11px}
+  li{font-size:13px;padding-left:18px}
+  .tag{font-size:11px;padding:4px 9px}
+  /* 太极 ⇄ 点圆：竖排，图缩小 */
+  .twoview{flex-direction:column;gap:10px;margin-top:10px}
+  .view{width:100%;padding:11px 12px 9px}
+  .tj{max-width:250px}
+  .pc{width:150px;height:150px}
+  .pc .dot{width:74px;height:74px;font-size:17px}
+  .vcap{font-size:11px;margin-top:7px}
+  .mid{font-size:20px}
+  .legend{gap:6px;margin-top:9px}
+  .lg{font-size:10.5px;padding:4px 8px}
+  .note{font-size:11px;margin-top:7px}
+  .ctrl{bottom:12px;right:12px;gap:7px}
+  .btn{width:40px;height:40px;font-size:15px}
+  .pg{bottom:14px;left:14px;font-size:11px}
+  .tip{display:none}
+  .ovw{padding:44px 16px;grid-template-columns:1fr}
+}
+@media (max-width:400px){ .tj{max-width:210px} .pc{width:132px;height:132px} }
+
+@media print{
+  body{overflow:visible;background:#fff;color:#000}
+  .slide{display:flex!important;position:relative;height:100vh;page-break-after:always}
+  .ctrl,.pg,.bar,.tip{display:none}
+}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;background:rgba(255,255,255,.09);color:var(--acc);padding:1px 6px;border-radius:5px;word-break:break-all}
+/* 数字讲解入口 */
+.dl-bar{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.dl-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+background:linear-gradient(96deg,var(--acc),var(--acc2));color:#06101f;font-weight:800;
+padding:9px 18px;border-radius:999px;font-size:14px;transition:.18s;border:none;cursor:pointer}
+.dl-btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.dl-hint{color:var(--mut);font-size:12.5px}
+.dl-hint b{color:var(--tx)}
+</style>
+</head>
+<body>
+
+<div class="bar" id="bar"></div>
+<div class="crumb"><a href="../">&#8962; 首页</a><span class="sep">/</span><span class="cur">配套课件</span></div>
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide active">
+  <div class="kicker">人工智能实践应用</div>
+  <a class="dl-btn" href="../" style="align-self:flex-start;margin-bottom:14px">← 返回太极首页</a>
+  <h1>从<span class="grad">会用 AI</span> 到 <span class="grad">会造 Agent</span></h1>
+  <div class="sub">搞懂 AI 怎么工作 —— 然后亲手搭一个 Agent，让它替你去做你想做的事。</div>
+  <div class="flow">
+    <span class="tag">① AI 怎么工作</span><span class="arw">→</span>
+    <span class="tag p">② 什么是 Agent</span><span class="arw">→</span>
+    <span class="tag">③ 怎么搭 Agent</span><span class="arw">→</span>
+    <span class="tag p">④ 用它做成事</span>
+  </div>
+  <div class="key">个人发起 · 开放协作 ｜ 手机上可左右滑动翻页</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s1" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">从第一句开始 · 全程约 3 分钟，可以边听边看</span>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">课程导览</div>
+  <h2>四步走：从原理到动手</h2>
+  <div class="grid g2">
+    <div class="card"><h3><span class="num">1</span>看透原理</h3><p>AI 不是魔法。理解「预测下一个词」，就理解了它 80% 的行为与局限。</p></div>
+    <div class="card"><h3><span class="num">2</span>搞懂运行</h3><p>一次请求如何流转；为什么「上下文」才是决定输出质量的关键变量。</p></div>
+    <div class="card"><h3><span class="num">3</span>搭建 Agent</h3><p>大脑 + 记忆 + 工具 + 规划 —— 四件套齐全，模型就变成会干活的智能体。</p></div>
+    <div class="card"><h3><span class="num">4</span>落地实战</h3><p>研究、写作、数据处理、自动化；以及五个高频坑怎么避。</p></div>
+  </div>
+  <div class="key">学完带走：一套可复制的项目结构 —— <b>太极模型</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s2" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">听听这门课到底要带你去哪 · 也可以翻回 <b>#s1</b></span>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">Part 01 · AI 的本质</div>
+  <h2>AI 在做什么？—— <span class="grad">预测下一个词</span></h2>
+  <div class="sub">它不查数据库、不思考、没有意识 —— 只是在按概率<b style="color:var(--tx)">续写</b>。</div>
+  <div class="flow">
+    <div class="node">你输入</div><span class="arw">→</span>
+    <div class="node">切 Token</div><span class="arw">→</span>
+    <div class="node hl">算下一个词</div><span class="arw">→</span>
+    <div class="node">选一个</div><span class="arw">→</span>
+    <div class="node">拼回去 · 循环</div>
+  </div>
+  <div class="key">理解了「续写」，就明白它<b>为什么需要好上下文、为什么会胡编</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s3" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">没跟上？点它听一遍 · 也可以翻回 <b>#s2</b> 从上一页听起</span>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">Part 01 · 四个关键概念</div>
+  <h2>懂这四个词，就能看懂所有 AI 讨论</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Token</h3><p>模型处理文本的最小单位，不等于「字」。计费与长度都按它算。</p></div>
+    <div class="card"><h3>上下文窗口</h3><p>一次能「看见」的内容上限。超出即遗忘。</p></div>
+    <div class="card"><h3>参数 / 权重</h3><p>训练压缩进模型的知识。有截止日期，不会自动更新。</p></div>
+    <div class="card"><h3>温度 Temperature</h3><p>控制随机性。要严谨设低，要创意设高。</p></div>
+  </div>
+  <div class="key">模型不知道昨天的事 —— 除非<b>放进上下文</b>，或给它<b>联网工具</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s4" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">四个词挨个讲一遍 · 也可以翻回 <b>#s3</b> 从上一页听起</span>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">Part 01 · AI 怎么运行</div>
+  <h2>一次对话的完整旅程</h2>
+  <div class="grid g2">
+    <div class="card"><h3><span class="num">1</span>组装上下文</h3><p>系统提示词 + 历史对话 + 本次输入 + 检索到的资料。</p></div>
+    <div class="card"><h3><span class="num">2</span>分词与编码</h3><p>文本切成 Token，映射成数字送进模型。</p></div>
+    <div class="card"><h3><span class="num">3</span>注意力计算</h3><p>判断上下文中哪些信息彼此相关、该重点看哪里。</p></div>
+    <div class="card"><h3><span class="num">4</span>逐词生成</h3><p>一次只出一个 Token，再喂回去循环 —— 所以长输出慢。</p></div>
+  </div>
+  <div class="key"><b>你喂进去的上下文，决定了它吐出来的质量。</b>所谓提示词工程，本质是上下文工程。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s5" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">跟着走一遍完整链路 · 也可以翻回 <b>#s4</b></span>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">Part 01 · 提示词</div>
+  <h2>好提示词的三要素</h2>
+  <div class="grid g3">
+    <div class="card"><h3>🎭 角色</h3><p>它是谁。角色决定语气与视角。</p></div>
+    <div class="card"><h3>🎯 任务</h3><p>具体产出什么。模糊指令 = 模糊结果。</p></div>
+    <div class="card"><h3>🧱 约束与示例</h3><p>不能做什么、参考什么格式。给样例最有效。</p></div>
+  </div>
+  <div class="key"><b>角色定视角 · 任务定产出 · 约束定边界。</b>垃圾进 → 垃圾出，永远成立。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s6" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">提示词的三个要件 · 也可以翻回 <b>#s5</b></span>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">Part 02 · 从 AI 到 Agent</div>
+  <h2>模型只会「说」，Agent 会「<span class="grad">做</span>」</h2>
+  <div class="ladder">
+    <div class="rung"><span class="add">纯 LLM</span><span class="cap">只会生成文字 —— 一个很会说话的大脑</span></div>
+    <div class="rung"><span class="add">+ 工具</span><span class="cap">能搜、能读文件、能跑代码、能调接口 —— 给它手脚</span></div>
+    <div class="rung"><span class="add">+ 记忆</span><span class="cap">能记住之前的对话与长期知识 —— 给它笔记本</span></div>
+    <div class="rung"><span class="add">+ 规划</span><span class="cap">能把大目标拆成步骤、逐步执行 —— 给它方法</span></div>
+    <div class="rung hl"><span class="add">= Agent</span><span class="cap">能自主推进、直到完成目标的系统</span></div>
+  </div>
+  <div class="key"><b>Agent = LLM 负责任务，工具负责执行，循环负责推进。</b></div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s7" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">Agent 的循环长什么样 · 也可以翻回 <b>#s6</b></span>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Part 02 · Agent 四件套</div>
+  <h2>拆开一个 Agent，里面就这四个东西</h2>
+  <div class="grid g2">
+    <div class="card"><h3>🧠 大脑 LLM</h3><p>理解意图、做决策、生成内容。按复杂度与成本选模型。</p></div>
+    <div class="card"><h3>📓 记忆 Memory</h3><p>短期 = 上下文窗口；长期 = 向量库 / 文件，把历史找回来。</p></div>
+    <div class="card"><h3>🛠 工具 Tools</h3><p>检索、读写、执行代码、发请求 —— 能力边界由它决定。</p></div>
+    <div class="card"><h3>🗺 规划 Planning</h3><p>拆解子任务、决定先后、判断何时结束。</p></div>
+  </div>
+  <div class="key">搭建 Agent 的全部工作，就是<b>给这四样各填一个答案</b>。缺哪样，就在哪样上掉链子。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s8" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">四问缺一不可 · 也可以翻回 <b>#s7</b></span>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker">Part 03 · 动手搭建</div>
+  <h2>六步搭出你的第一个 Agent</h2>
+  <div class="grid g3">
+    <div class="card"><h3><span class="num">1</span>定目标</h3><p>一句话写清「输入 → 输出」。</p></div>
+    <div class="card"><h3><span class="num">2</span>选大脑</h3><p>复杂用强模型，简单用轻模型。</p></div>
+    <div class="card"><h3><span class="num">3</span>配工具</h3><p>只给必需的 —— 最小权限。</p></div>
+    <div class="card"><h3><span class="num">4</span>写内核提示词</h3><p>身份 / 目标 / 原则 / 边界（见下页）。</p></div>
+    <div class="card"><h3><span class="num">5</span>设循环</h3><p>观察 → 思考 → 行动 → 再观察。</p></div>
+    <div class="card"><h3><span class="num">6</span>测与迭代</h3><p>用真实任务跑，看它卡在哪。</p></div>
+  </div>
+  <div class="key">第一步最重要：<b>目标模糊</b>是 Agent 失败的头号原因。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s9" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">目标怎么定才算清楚 · 也可以翻回 <b>#s8</b></span>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker">Part 03 · Agent 的内核</div>
+  <h2>系统提示词：用「四问法」写</h2>
+  <div class="grid g2">
+    <div class="card"><h3>你是谁？</h3><p>角色与身份。<em>例：一名严谨的行业研究员。</em></p></div>
+    <div class="card"><h3>你要做什么？</h3><p>目标与产出标准。<em>例：输出带数据来源的结构化简报。</em></p></div>
+    <div class="card"><h3>你遵循什么？</h3><p>原则与工作流。<em>例：先检索再下结论，不确定必须标注。</em></p></div>
+    <div class="card"><h3>你不做什么？</h3><p>红线与禁区。<em>例：不编造数据、不执行未授权操作。</em></p></div>
+  </div>
+  <div class="key">这四问，正是内核文件 <b>Memory.md</b> 的四段。给 Agent 写提示词 ＝ 给项目写内核。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s10" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">内核四段与四问的对应 · 也可以翻回 <b>#s9</b></span>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker">Part 04 · 实战场景</div>
+  <h2>用 Agent 去做你真正想做的事</h2>
+  <div class="grid g3">
+    <div class="card"><h3>🔍 信息研究</h3><p>检索多源 → 交叉验证 → 汇总成带引用的报告。</p></div>
+    <div class="card"><h3>✍️ 内容生产</h3><p>选题 → 大纲 → 初稿 → 多平台改写。</p></div>
+    <div class="card"><h3>📊 数据处理</h3><p>读表 → 清洗 → 统计 → 出图 → 给结论。</p></div>
+    <div class="card"><h3>⚙️ 流程自动化</h3><p>定时巡检、异常告警、日报周报。</p></div>
+    <div class="card"><h3>🗂 个人知识库</h3><p>沉淀资料、随时问答、按你的口径整理。</p></div>
+    <div class="card"><h3>🤝 多 Agent 协作</h3><p>一个搜、一个写、一个审 —— 分工更稳。</p></div>
+  </div>
+  <div class="key">挑一件<b>你每周都要做的烦事</b>开始，别从「你好世界」起步。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s11" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">第一个 Agent 该做什么 · 也可以翻回 <b>#s10</b></span>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="kicker">Part 04 · 执行闭环</div>
+  <h2>任务是怎么被跑完的</h2>
+  <div class="flow">
+    <div class="node">收到目标</div><span class="arw">→</span>
+    <div class="node">拆解步骤</div><span class="arw">→</span>
+    <div class="node hl">调用工具</div><span class="arw">→</span>
+    <div class="node">观察结果</div><span class="arw">→</span>
+    <div class="node">判断修正</div><span class="arw">↻</span>
+    <div class="node">达成交付</div>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><h3>循环是核心</h3><p>价值不在一次答对，而在答错能自己发现并重试。</p></div>
+    <div class="card"><h3>人在环路</h3><p>付款、删数据、对外发布 —— 必须人工确认。</p></div>
+    <div class="card"><h3>可观测</h3><p>记下每步输入输出，出错时是唯一的回溯抓手。</p></div>
+  </div>
+  <div class="key">能把过程记下来，<b>才调得动</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s12" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">让它把过程记下来 · 也可以翻回 <b>#s11</b></span>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="kicker">Part 04 · 避坑</div>
+  <h2>五个高频坑，及应对</h2>
+  <div class="ladder">
+    <div class="rung"><span class="add">幻觉</span><span class="cap">一本正经编造事实 → 要求给出处，关键结论交叉验证</span></div>
+    <div class="rung"><span class="add">上下文超窗</span><span class="cap">长对话后遗忘矛盾 → 定期摘要压缩，长材料改检索</span></div>
+    <div class="rung"><span class="add">越权执行</span><span class="cap">自作主张 → 边界写进内核提示词 + 人工确认</span></div>
+    <div class="rung"><span class="add">成本失控</span><span class="cap">循环停不下来 → 设最大步数与预算上限</span></div>
+    <div class="rung hl"><span class="add">凭证泄露</span><span class="cap">密钥写进代码/仓库 → 真值入 Vault，只留引用名</span></div>
+  </div>
+  <div class="key">前四个是<b>能力问题</b>，第五个是<b>安全问题</b> —— 安全坑代价最大。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s13" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">五个坑，安全那个最贵 · 也可以翻回 <b>#s12</b></span>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <div class="kicker">本项目结构 · 太极 ⇄ 点圆</div>
+  <h2>这门课自己，就是按这套模型搭的</h2>
+  <div class="twoview">
+    <div class="view">
+      <div class="vtitle">太极 · 展开态<span>阴阳双鱼 · S曲线 · 双鱼眼</span></div>
+      <svg viewBox="0 0 330 300" class="tj" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="yang" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#cbddff"/></linearGradient></defs>
+        <circle cx="140" cy="150" r="110" fill="url(#yang)"/>
+        <path d="M140,40 A110,110 0 0,0 140,260 A55,55 0 0,1 140,150 A55,55 0 0,0 140,40 Z" fill="#141d3d"/>
+        <path d="M140,260 A55,55 0 0,1 140,150 A55,55 0 0,0 140,40" fill="none" stroke="#22d3ee" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="140" cy="150" r="14" fill="#22d3ee"/>
+        <text x="140" y="155" text-anchor="middle" font-size="12" font-weight="800" fill="#06121f">R</text>
+        <circle cx="140" cy="150" r="110" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.4"/>
+        <circle cx="140" cy="95" r="21" fill="#eef4ff"/>
+        <text x="140" y="100" text-anchor="middle" font-size="13" font-weight="800" fill="#141d3d">S</text>
+        <circle cx="140" cy="205" r="21" fill="#141d3d"/>
+        <text x="140" y="210" text-anchor="middle" font-size="12" font-weight="800" fill="#eef4ff">E3</text>
+        <text x="80" y="100" text-anchor="middle" font-size="16" font-weight="800" fill="#8095cf">M</text>
+        <text x="108" y="192" text-anchor="middle" font-size="15" font-weight="800" fill="#4a5e8e">E1</text>
+        <text x="172" y="192" text-anchor="middle" font-size="15" font-weight="800" fill="#4a5e8e">E2</text>
+        <line x1="161" y1="205" x2="256" y2="205" stroke="#a78bfa" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <rect x="256" y="187" width="66" height="36" rx="9" fill="rgba(167,139,250,.16)" stroke="#a78bfa" stroke-width="1.2"/>
+        <text x="289" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#c4b5fd">Vault</text>
+      </svg>
+      <div class="vcap"><b>阴鱼整体 = 内核</b>：鱼身 M ＋ S曲线 R ＋ 鱼眼 S<br>
+        <b>阳鱼整体 = 外延</b>：鱼身 E1/E2 ＋ 鱼眼 E3<br>
+        Vault ＝ E3 鱼眼的<b>真值</b>，隐于圆外<br>
+        <span style="color:var(--acc2)">阴中阳点=S（内核中唯一的"动"）· 阳中阴点=E3（外延中唯一的"实"）</span></div>
+    </div>
+    <div class="mid">⇄<span>同构</span></div>
+    <div class="view">
+      <div class="vtitle">点圆 · 收敛态<span>内点 · 外圆</span></div>
+      <div class="pc"><div class="ring"></div><div class="dot">●</div></div>
+      <div class="vcap"><b>● 实点</b>：内核，内藏 <b>M · R · S</b><br><b>○ 虚圆</b>：外延，内分 <b>E1 · E2 · E3_ref</b><br>S曲线→点内约定；鱼眼→引用与 Vault 规则</div>
+      <div class="vcap" style="margin-top:8px">Vault <b>隐于圆外</b>，真值不画，只留引线</div>
+    </div>
+  </div>
+  <div class="legend">
+    <span class="lg"><b>阴鱼</b> M/R/S</span><span class="lg"><b>S曲线</b> R 协议</span>
+    <span class="lg"><b>阴中阳点</b> S</span><span class="lg"><b>阳鱼</b> E1/E2</span>
+    <span class="lg"><b>阳中阴点</b> E3</span><span class="lg"><b>圆外</b> Vault</span>
+  </div>
+  <div class="key">公式：<b>Context = ●(M|R|S) + ○(E1|E2|E3_ref)</b>，真值 ∈ Vault。<br>点不动，圆可扩 —— 把上下文变成可迁移资产。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s14" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">太极模型全貌 · 也可以翻回 <b>#s13</b></span>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <div class="kicker">太极三层 · 神 形 经 窍</div>
+  <h2>神是内核，形是外延，经是协同</h2>
+  <div class="grid g2">
+    <div class="card"><h3>神 · 内核 M</h3><p>内在灵魂：我是谁、为何做、不做什么。低频变化，主宰方向。</p></div>
+    <div class="card"><h3>形 · 外延 E</h3><p>外显肉体：工具、配置、凭证引用。可插拔、可扩张。</p></div>
+    <div class="card"><h3>经 · S 曲线 R</h3><p>形神相接：<b style="color:var(--tx)">唯一同时属于两边</b>的接触面 —— 由内核所写，作用于外延，既分界又耦合。</p></div>
+    <div class="card"><h3>窍 · 双鱼眼</h3><p>气机出入：阴鱼眼 <b style="color:var(--tx)">S 向外</b>说「我到哪了」；阳鱼眼 <b style="color:var(--tx)">E3 向内</b>取真值钥匙。<b style="color:var(--tx)">一出一入</b>。</p></div>
+  </div>
+  <div class="key"><b>形者神之质，神者形之用。</b>形神相即 —— 内核离开外延动不了，外延离开内核只是散件；<b>孤阴不生，孤阳不长</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s15" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">内核三件套 · 也可以翻回 <b>#s14</b></span>
+  </div>
+  <div class="note">注意：这是「互根共生」，不是「灵魂可脱离肉体」的二元对立。</div>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <div class="kicker">落地 · 内核三件套</div>
+  <h2>落到你电脑上，就是<span class="grad">三个文件</span></h2>
+  <div class="grid g3">
+    <div class="card"><h3>● Memory.md　内核</h3><p><b style="color:var(--tx)">我是谁 / 为何做 / 不做什么</b><br>几乎不变 · <b class="hl">必须人亲笔</b></p></div>
+    <div class="card"><h3>● Readme.md　协议</h3><p><b style="color:var(--tx)">怎么读 / 怎么写 / 凭证从哪取</b><br>少变 · 人为主，脚本辅助</p></div>
+    <div class="card"><h3>● State.md　状态</h3><p><b style="color:var(--tx)">现在在哪 / 卡在哪 / 下一步</b><br>每次干活都变 · Agent 收工前回写</p></div>
+  </div>
+  <div class="key">这三个之外全是外延 —— <b>可替换、可扩展、可放心交给机器</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s16" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">形神相即 · 也可以翻回 <b>#s15</b></span>
+  </div>
+  <div class="note">缺 M：「我不知道哪些不能碰，可能顺手就把你的核心改了。」　缺 R：「文件摆了一堆，我不知道先读哪个。」　缺 S：「我不知道上次做到哪，最保险是从第一步重做。」</div>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <div class="kicker">怎么用 · 三个阶段</div>
+  <h2>一个模型，<span class="grad">三种处境</span></h2>
+  <div class="grid g3">
+    <div class="card"><h3>① 起 · 装上模型</h3><p><b style="color:var(--tx)">新建</b>：复制 <code>template/</code> 骨架，填空即可<br><b style="color:var(--tx)">升级</b>：跑 <code>adopt.py</code>，<b class="hl">只加一层，不动你一行代码</b><br><span style="color:var(--mut)">→ 身份与目标留空，只能你填</span></p></div>
+    <div class="card"><h3>② 交 · 交给别人</h3><p>跑 <code>handoff.py .</code><br>得到 <b style="color:var(--tx)">单文件 HANDOFF.md</b>，自带交接前自检<br><span style="color:var(--mut)">→ 内核原样搬、外延只给索引、真值只给名字</span></p></div>
+    <div class="card"><h3>③ 沉 · 教训变规矩</h3><p>跑 <code>distill.py</code> → 勾 <code>[x]</code> → <code>--apply</code><br>把 Journal 里的教训提炼回 <b style="color:var(--tx)">Memory.md</b><br><span style="color:var(--mut)">→ 一次是意外，两次是模式，三次是原则</span></p></div>
+  </div>
+  <div class="key"><b>adopt 是入口，handoff 是出口，distill 让它自己长大。</b>三个脚本默认<b>只读你的内核</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s17" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">三个脚本怎么配合 · 也可以翻回 <b>#s16</b></span>
+  </div>
+  <div class="note">唯一例外是 <code>distill.py --apply</code> —— 前提是你已手动勾选。<b>机器给候选，人来拍板</b>，脚本永远不会自己决定该相信哪条教训。</div>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <div class="kicker">换个视角 · 两阶</div>
+  <h2>任何事物都有<span class="grad">两个阶段</span></h2>
+  <div class="grid g3">
+    <div class="card"><h3>① 炼化炉阶段 · 造</h3><p>从<b style="color:var(--tx)">原料到产品</b>，把能力炼出来。<br>关注内部、过程、正确。<br><span style="color:var(--mut)">→ 起 / 交 / 沉，都在这一相位</span></p></div>
+    <div class="card"><h3>② 使用阶段 · 用</h3><p>产品被<b style="color:var(--tx)">消耗</b>。<br>关注外部、体验、效果。<br><span style="color:var(--mut)">→ 好不好用，只有人说了算</span></p></div>
+    <div class="card"><h3>中间段 · 成形</h3><p>炼化炉的产出要「<b style="color:var(--tx)">落定</b>」成能独立存在的制品，才算跨过边界。<br><span style="color:var(--mut)">→ 交接包、课件，都是这样来的</span></p></div>
+  </div>
+  <div class="key"><b>炼化炉回答「对不对」，使用回答「好不好」。</b>机器管得了前者，管不了后者 —— 这就是为什么<b>模型处处留人工闸门</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s18" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">两阶 · 也可以翻回 <b>#s17</b></span>
+  </div>
+  <div class="note">所以这套模型本身就是炼化炉：我们搭它、改它、验证它，都在「造」的那一半；真正验证它好不好用，得等你拿它去干活。</div>
+</section>
+
+<!-- 19 -->
+<section class="slide">
+  <div class="kicker">坐标系 · 四个时代</div>
+  <h2>谁卡住<span class="grad">瓶颈</span>，谁收租</h2>
+  <table class="ttable">
+    <thead>
+      <tr><th>时代</th><th>炼化核心</th><th>流通核心</th><th>主要产品</th><th>收租者</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>农业</td><td>土地 + 种子 + 人力</td><td>集市、驿道、熟人信用</td><td>粮食</td><td class="rent">地主</td></tr>
+      <tr><td>工业</td><td>原料 + 工厂 + 机器</td><td>铁路、电报、商场、银行</td><td>制成品</td><td class="rent">产业资本 + 铺王</td></tr>
+      <tr><td>信息</td><td>代码 + 内容 + 软件</td><td>互联网、平台、支付、物流</td><td>作品 / 服务</td><td class="rent">平台</td></tr>
+      <tr class="hl"><td>数字</td><td>数据 + 算法 + 算力</td><td>AI 推荐 + 即时履约 + 智能代理</td><td>决策 / 行动</td><td class="rent">AI 平台 + 数据地主</td></tr>
+    </tbody>
+  </table>
+  <div class="key"><b>瓶颈在两端之间轮换，收租权跟着走。</b>商场不生产商品，它聚合交易、收位置租金 —— 它发达是因为工业让成品过剩，<b>过剩必然把价值从炼化端推向流通端</b>。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s19" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">四代对照 · 也可以翻回 <b>#s18</b></span>
+  </div>
+  <div class="note">数字时代：炼化与流通合一为闭环（生产即流通）。但「合」是对平台而言的合，「分」是对生态而言的分 —— <b>分分合合，才是永恒的过程</b>。</div>
+</section>
+
+<!-- 20 -->
+<section class="slide">
+  <div class="kicker">开始行动</div>
+  <h1 style="font-size:clamp(26px,4.2vw,50px)">今天就搭出你的<span class="grad">第一个 Agent</span></h1>
+  <div class="grid g3">
+    <div class="card"><h3><span class="num">1</span>挑真任务</h3><p>挑一件你每周都要做的烦事。</p></div>
+    <div class="card"><h3><span class="num">2</span>写清四问</h3><p>身份 / 目标 / 原则 / 边界。</p></div>
+    <div class="card"><h3><span class="num">3</span>最小可跑</h3><p>一个模型 + 一个工具 + 一个循环。</p></div>
+  </div>
+  <div class="key">AI 不会取代你，但<b>会用 Agent 的人</b>会取代不会用的人。</div>
+
+  <div style="margin-top:22px">
+    <div class="key" style="margin-bottom:14px">讲完了。下面这一步，决定这套模型你到底会不会用。</div>
+  <div class="dl-bar">
+    <a class="dl-btn" href="digital.html#s18" target="_blank" rel="noopener">▶ 数字讲解这一页</a>
+    <span class="dl-hint">最后一页，讲完就动手 · 也可以翻回 <b>#s17</b></span>
+  </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;text-align:left">
+
+      <a href="digital.html#s1" target="_blank" rel="noopener" style="display:block;padding:15px 17px;border-radius:13px;text-decoration:none;
+        border:1px solid rgba(34,211,238,.45);color:var(--tx);background:rgba(34,211,238,.07)">
+        <div style="font-weight:700;font-size:clamp(14px,2.1vw,17px)">🎧 数字讲解版</div>
+        <div style="font-size:13px;color:var(--mut);margin-top:5px;line-height:1.6">
+          <b>20 页全部配音上线</b>，从第 1 页连续听到第 20 页<br>
+          <span style="font-size:12.5px">空格暂停 · 方向键翻段 · 卡片跟着讲解逐张亮</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--acc);margin-top:7px">每页右上角也有入口，可只讲这一页</div>
+      </a>
+
+      <a href="handoff-lab.html" style="display:block;padding:15px 17px;border-radius:13px;text-decoration:none;
+        background:linear-gradient(92deg,var(--acc),var(--acc2));color:#06121f">
+        <div style="font-weight:700;font-size:clamp(14px,2.1vw,17px)">▶ 交接实验室</div>
+        <div style="font-size:13px;opacity:.85;margin-top:5px;line-height:1.6">
+          你的项目，能被一个失忆的 Agent 接住吗<br>
+          <b>分拣上下文 → 失忆 Agent 当场验收 → 导出交接包</b>
+        </div>
+        <div style="font-size:11.5px;opacity:.75;margin-top:7px">★ 这套模型真正的用处，在这</div>
+      </a>
+
+      <a href="practice.html" style="display:block;padding:15px 17px;border-radius:13px;text-decoration:none;
+        border:1px solid var(--line);color:var(--tx);background:rgba(255,255,255,.03)">
+        <div style="font-weight:700;font-size:clamp(14px,2.1vw,17px)">热身：你当一次 Agent 的大脑</div>
+        <div style="font-size:13px;color:var(--mut);margin-top:5px;line-height:1.6">
+          先弄懂循环到底怎么转<br>
+          <span style="font-size:12.5px">一步调用 → 两步串联 → 工具出错怎么办</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--mut);margin-top:7px">还没玩过 Agent 的，从这个开始</div>
+      </a>
+
+      <a href="k.html" style="display:block;padding:15px 17px;border-radius:13px;text-decoration:none;
+        border:1px solid rgba(240,198,116,.45);color:var(--tx);background:rgba(240,198,116,.07)">
+        <div style="font-weight:700;font-size:clamp(14px,2.1vw,17px)">🗄️ K 硬核资产 · 橱窗与货架</div>
+        <div style="font-size:13px;color:var(--mut);margin-top:5px;line-height:1.6">
+          怎么让你被 AI 调用<br>
+          <b>橱窗（可检索）＋ 货架（价签可见，成交才给）</b>
+        </div>
+        <div style="font-size:11.5px;color:var(--gold,#f0c674);margin-top:7px">▶ 看实例：llms.txt / index.json</div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="sub" style="font-size:13px">本项目开放协作：讲稿可 Fork、案例可补充、错误可提 Issue。<br>内核（原则）慎改，外延（案例/工具）欢迎扩充。</div>
+</section>
+
+</div>
+
+<div class="pg" id="pg">01 / 20</div>
+<div class="tip">← → 翻页 ｜ F 全屏 ｜ O 总览 ｜ ⌂ 返回首页 ｜ Ctrl+P 导出 PDF ｜ 🎧 20 页数字讲解已全部上线</div>
+<div class="ctrl">
+  <a class="btn" id="home" title="返回首页" href="../">⌂</a>
+  <button class="btn" id="ov" title="总览">▦</button>
+  <button class="btn" id="pr" title="上一页">‹</button>
+  <button class="btn" id="nx" title="下一页">›</button>
+  <button class="btn" id="fs" title="全屏">⛶</button>
+</div>
+<div class="ovw" id="ovw"></div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const bar=document.getElementById('bar'),pg=document.getElementById('pg'),ovw=document.getElementById('ovw');
+let i=0; const pad=n=>String(n).padStart(2,'0');
+
+function show(n){
+  i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>{s.classList.toggle('active',k===i); if(k===i) s.scrollTop=0;});
+  pg.textContent=pad(i+1)+' / '+pad(slides.length);
+  bar.style.width=((i+1)/slides.length*100)+'%';
+  [...ovw.children].forEach((m,k)=>m.classList.toggle('cur',k===i));
+  history.replaceState(null,'','#s'+(i+1));
+}
+slides.forEach((s,k)=>{
+  const d=document.createElement('div'); d.className='mini';
+  const t=s.querySelector('h1,h2');
+  d.innerHTML='<b>'+pad(k+1)+' '+(t?t.textContent.trim():'')+'</b><span>'+(s.querySelector('.kicker')?.textContent||'')+'</span>';
+  d.onclick=()=>{ovw.classList.remove('on');show(k)};
+  ovw.appendChild(d);
+});
+const toggleOv=()=>ovw.classList.toggle('on');
+document.getElementById('nx').onclick=()=>show(i+1);
+document.getElementById('pr').onclick=()=>show(i-1);
+document.getElementById('fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
+document.getElementById('ov').onclick=toggleOv;
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();show(i+1)}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1)}
+  else if(e.key==='Home')show(0);
+  else if(e.key==='End')show(slides.length-1);
+  else if(e.key==='f'||e.key==='F')document.getElementById('fs').click();
+  else if(e.key==='o'||e.key==='O')toggleOv();
+  else if(e.key==='Escape')ovw.classList.remove('on');
+});
+
+// 手机：左右滑动翻页（避免在可滚动区域内误触）
+let x0=null,y0=null;
+document.addEventListener('touchstart',e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(x0===null)return;
+  const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.6){ dx<0?show(i+1):show(i-1); }
+  x0=null;y0=null;
+},{passive:true});
+
+show(parseInt((location.hash.match(/s(\d+)/)||[])[1]||1)-1);
+</script>
+</body>
+</html>
