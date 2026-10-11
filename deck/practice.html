@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>动手练习 · 你来当一次 Agent 的大脑</title>
+<style>
+:root{
+  --bg:#080d1a; --tx:#e8eefc; --mut:#9fb0cc; --line:rgba(255,255,255,.11);
+  --acc:#22d3ee; --acc2:#a78bfa; --warn:#fbbf24; --ok:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.7 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  padding:26px 18px 60px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto}
+.kicker{font-size:12.5px;letter-spacing:.16em;color:var(--acc);text-transform:uppercase;margin-bottom:8px}
+h1{font-size:clamp(24px,4vw,38px);line-height:1.25;margin-bottom:10px}
+.grad{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mut);font-size:14.5px;max-width:720px}
+.hero{border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:14px;padding:14px 16px;margin:20px 0 26px;
+  background:rgba(34,211,238,.06);font-size:14.5px;color:var(--mut)}
+.hero b{color:var(--tx)}
+
+/* 任务卡 */
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
+.task{border:1px solid var(--line);border-radius:14px;padding:14px 15px;cursor:pointer;transition:.16s;background:rgba(255,255,255,.025)}
+.task:hover{border-color:var(--acc);transform:translateY(-2px)}
+.task.on{border-color:var(--acc);background:rgba(34,211,238,.1)}
+.task .n{font-size:11px;color:var(--acc);letter-spacing:.1em}
+.task h3{font-size:15px;margin:4px 0 5px}
+.task p{font-size:12.5px;color:var(--mut);line-height:1.6}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.panel{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(255,255,255,.025)}
+.panel h2{font-size:13px;color:var(--acc);letter-spacing:.08em;margin-bottom:12px;font-weight:600}
+
+.goal{background:#0d1426;border:1px dashed var(--line);border-radius:11px;padding:12px 14px;font-size:15px;margin-bottom:14px}
+.goal small{display:block;color:var(--mut);font-size:12px;margin-bottom:4px}
+
+label{display:block;font-size:12.5px;color:var(--mut);margin:12px 0 5px}
+select,input,textarea{width:100%;background:#0d1426;color:var(--tx);border:1px solid var(--line);
+  border-radius:9px;padding:10px 11px;font:14px inherit;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--acc)}
+.tipx{font-size:11.5px;color:var(--mut);margin-top:4px}
+.row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+button{flex:1;min-width:110px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:var(--tx);font:14px inherit;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--acc);color:var(--acc)}
+button.pri{background:linear-gradient(92deg,var(--acc),var(--acc2));color:#06121f;border:none;font-weight:600}
+button.pri:hover{opacity:.9;color:#06121f}
+button.gh{background:transparent}
+
+/* 轨迹 */
+.trace{min-height:230px;max-height:52vh;overflow-y:auto}
+.step{border-left:2px solid var(--line);padding:0 0 16px 16px;position:relative;margin-left:6px}
+.step:last-child{border-left-color:transparent}
+.step::before{content:'';position:absolute;left:-6px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.step.obs::before{background:var(--mut)}
+.step.ans::before{background:var(--ok)}
+.step .h{font-size:11.5px;color:var(--acc);letter-spacing:.08em;margin-bottom:3px}
+.step.obs .h{color:var(--mut)} .step.ans .h{color:var(--ok)}
+.step .b{font-size:13.5px;color:var(--tx);word-break:break-word}
+.step .b code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:5px;font-size:12.5px}
+.step.err .b{color:var(--warn)}
+.empty{color:var(--mut);font-size:13px;padding:20px 0;text-align:center}
+
+.meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:12px}
+.meta span{border:1px solid var(--line);padding:3px 9px;border-radius:7px}
+
+.result{border:1px solid var(--ok);border-radius:14px;padding:16px;background:rgba(52,211,153,.08);margin-top:18px;display:none}
+.result.show{display:block}
+.result h3{color:var(--ok);font-size:16px;margin-bottom:8px}
+.result p{font-size:14px;color:var(--mut);line-height:1.75}
+.result b{color:var(--tx)}
+
+.foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--mut);text-align:center}
+
+@media(max-width:820px){
+  .grid{grid-template-columns:1fr}
+  .trace{max-height:none}
+  button{min-width:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">Hands-on · 动手练习</div>
+  <h1>你来当一次 <span class="grad">Agent 的大脑</span></h1>
+  <p class="lead">不装环境、不要 Key、不写代码。你负责「下一步做什么」，工具负责「做」。做完你就明白 Agent 到底是怎么转的。</p>
+
+  <div class="hero">
+    平时是 <b>LLM 在做「你接下来要做的这个决定」</b>。这个练习把它换成了你 ——
+    你亲手走一遍循环，再看数据是怎么一步步流动的，就再也不会觉得 Agent 神秘了。
+  </div>
+
+  <div class="hero" style="border-color:var(--warn);border-left-color:var(--warn);background:rgba(251,191,36,.07)">
+    先说清楚定位：这是<b>热身</b>。弄懂循环怎么转，是前提，但<b>不是这套模型的重点</b>。<br>
+    Agent 循环谁都能讲；真正值钱的是「<b>怎么让项目交接时不失真</b>」——
+    <a href="handoff-lab.html" style="color:var(--acc);text-decoration:none">进交接实验室 →</a>
+  </div>
+
+  <h2 style="font-size:13px;color:var(--acc);letter-spacing:.08em;margin-bottom:10px">选一个任务</h2>
+  <div class="tasks" id="tasks"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>你的决策台</h2>
+      <div class="goal"><small>当前目标</small><span id="goal">—</span></div>
+
+      <label>① 这一步，你要调用哪个工具？</label>
+      <select id="tool">
+        <option value="calculator">计算器 —— 算数学表达式</option>
+        <option value="lookup">查资料 —— 查内置小知识库</option>
+        <option value="count">数字数 —— 统计一段文本</option>
+      </select>
+
+      <label>② 传给它什么参数？</label>
+      <input id="arg" placeholder="365 * 24">
+      <div class="tipx" id="argtip"></div>
+
+      <div class="row">
+        <button class="pri" onclick="act()">执行工具 ›</button>
+        <button class="gh" onclick="finish()">不用了，我给答案</button>
+      </div>
+      <div class="row">
+        <button class="gh" onclick="hint()" style="flex:0 0 auto;min-width:92px">💡 提示</button>
+        <button class="gh" onclick="autoRun()" style="flex:1">🤖 让机器替我走一遍</button>
+      </div>
+
+      <div class="meta">
+        <span>步数 <b id="cnt">0</b></span>
+        <span>工具调用 <b id="calls">0</b></span>
+        <span id="tname">未选任务</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>执行轨迹（循环可视化）</h2>
+      <div class="trace" id="trace">
+        <div class="empty">选一个任务开始 —— 你的每个决定都会出现在这里</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result" id="res"></div>
+
+  <div class="foot">配套《从会用 AI 到会造 Agent》讲稿 · 纯浏览器运行，不联网、不上传任何数据</div>
+</div>
+
+<script>
+/* ---------- 工具：Agent 的「手」。这里就是你将来给真 Agent 装东西的地方 ---------- */
+const KB = {
+  "三体字数": 880000, "红楼梦字数": 730000, "西游记字数": 820000,
+  "地球赤道周长": 40075, "珠峰高度": 8848.86, "中国人口": 1410000000,
+  "一年天数": 365, "一天小时": 24
+};
+const TOOLS = {
+  calculator: {
+    name:"计算器", tip:"只认数字和 + - * / ( )，例：365 * 24 —— 这也是为什么真 Agent 要做安全校验",
+    ph:"365 * 24",
+    run(a){
+      if(!/^[\d\.\s\+\-\*\/\(\)]+$/.test(a)) throw new Error("只允许数字和 + - * / ( )");
+      const v = Function('"use strict";return ('+a+')')();
+      if(!isFinite(v)) throw new Error("结果不是有限数（检查是不是除以 0 了）");
+      return String(Math.round(v*1e6)/1e6);
+    }
+  },
+  lookup: {
+    name:"查资料", tip:"关键词模糊匹配，例：三体字数", ph:"三体字数",
+    run(a){
+      const k = Object.keys(KB).find(x => x.includes(a) || a.includes(x));
+      if(!k) throw new Error("没查到。可用的键：" + Object.keys(KB).join(" / "));
+      return k + " = " + KB[k].toLocaleString();
+    }
+  },
+  count: {
+    name:"数字数", tip:"统计去掉空格后的字数", ph:"把你想数的字贴在这里",
+    run(a){ return String(a.replace(/\s/g,"").length) + " 字"; }
+  }
+};
+
+const TASKS = [
+  { n:"01", t:"一步：让工具替你算", d:"一年有多少小时？认识「调用工具」这件事本身。",
+    goal:"一年有多少小时？", ans:["8760"],
+    hint:"选「计算器」，参数填 <code>365 * 24</code>，然后点「执行工具」。", classic:1 },
+  { n:"02", t:"两步：把查到的数喂回去", d:"先查、再算 —— 这是 Agent 真正的威力所在。",
+    goal:"《三体》比《红楼梦》多多少字？", ans:["150000","15万"],
+    hint:"两个数字你都不知道，得先各查一次（<code>三体字数</code>、<code>红楼梦字数</code>），再算差值。", classic:3 },
+  { n:"03", t:"工具会出错，怎么办", d:"真实世界没有永不失败的工具。学会看错误反馈、改参数重试。",
+    goal:"算一下 1410000000 / 365 —— 再试试 100 / 0 会发生什么。", ans:["3863013"],
+    hint:"先算 <code>1410000000 / 365</code>。再试试 <code>100 / 0</code> —— 报错信息本身就是喂回大脑的反馈。", classic:1 },
+  { n:"04", t:"自由任务（自己定目标）", d:"你已经懂了 —— 现在给自己出个题。",
+    goal:"（自由）用工具完成一件你想算/想查的事", ans:null,
+    hint:"随便玩。查一次资料、数一段字、算一个式子，都行。", classic:99 }
+];
+
+let cur = -1, steps = 0, calls = 0, done = false;
+
+const tasksEl = document.getElementById("tasks");
+TASKS.forEach((t,i)=>{
+  const d = document.createElement("div");
+  d.className = "task"; d.innerHTML =
+    '<div class="n">'+t.n+'</div><h3>'+t.t+'</h3><p>'+t.d+'</p>';
+  d.onclick = ()=>pick(i);
+  tasksEl.appendChild(d);
+});
+
+function pick(i){
+  cur = i; steps = 0; calls = 0; done = false;
+  [...tasksEl.children].forEach((c,k)=>c.classList.toggle("on",k===i));
+  document.getElementById("goal").textContent = TASKS[i].goal;
+  document.getElementById("tname").textContent = TASKS[i].t;
+  document.getElementById("trace").innerHTML = '<div class="empty">目标已就绪 —— 现在由你决定第一步</div>';
+  document.getElementById("res").className = "result";
+  document.getElementById("cnt").textContent = 0;
+  document.getElementById("calls").textContent = 0;
+  syncTip();
+}
+function syncTip(){
+  const k = document.getElementById("tool").value;
+  document.getElementById("arg").placeholder = TOOLS[k].ph;
+  document.getElementById("argtip").textContent = TOOLS[k].tip;
+}
+document.getElementById("tool").onchange = syncTip;
+
+function push(kind, head, body, err){
+  const t = document.getElementById("trace");
+  if(steps===0) t.innerHTML = "";
+  const d = document.createElement("div");
+  d.className = "step " + kind + (err?" err":"");
+  d.innerHTML = '<div class="h">'+head+'</div><div class="b">'+body+'</div>';
+  t.appendChild(d); t.scrollTop = t.scrollHeight;
+}
+
+function act(){
+  if(cur<0){ alert("先选一个任务"); return; }
+  const tk = document.getElementById("tool").value;
+  const arg = document.getElementById("arg").value.trim();
+  if(!arg){ alert("给它一个参数，工具才知道要做什么"); return; }
+  steps++;
+  push("", "第 "+steps+" 步 · 你的决定", "调用 <code>"+TOOLS[tk].name+"</code>，参数：<code>"+esc(arg)+"</code>");
+  let out;
+  try { out = TOOLS[tk].run(arg); calls++; }
+  catch(e){ out = "❌ " + e.message; calls++;
+    push("obs", "观察 · 工具返回了错误", esc(out), true);
+    document.getElementById("cnt").textContent = steps;
+    document.getElementById("calls").textContent = calls;
+    return; }
+  push("obs", "观察 · 工具返回结果", "<code>"+esc(out)+"</code>");
+  document.getElementById("cnt").textContent = steps;
+  document.getElementById("calls").textContent = calls;
+  document.getElementById("arg").value = "";
+}
+
+function finish(){
+  if(cur<0){ alert("先选一个任务"); return; }
+  const v = prompt("你的最终答案是什么？");
+  if(v===null) return;
+  steps++;
+  push("ans", "第 "+steps+" 步 · 你给出了答案", "<code>"+esc(v)+"</code>");
+  document.getElementById("cnt").textContent = steps;
+  const t = TASKS[cur];
+  const ok = t.ans ? t.ans.some(a=>v.replace(/\s|,/g,"").includes(a.replace(/\s|,/g,""))) : true;
+  showResult(ok, v);
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function showResult(ok, v){
+  const t = TASKS[cur], el = document.getElementById("res");
+  let extra = "";
+  if(t.classic<=3){
+    extra = calls<=t.classic
+      ? "👏 干净利落 —— 这类任务 "+t.classic+" 次工具调用就够了。"
+      : "你调了 "+calls+" 次工具。其实 "+t.classic+" 次就能解 —— 多出来的每一步，真 Agent 都在白烧 token 和时间。";
+  }
+  el.innerHTML =
+    '<h3>'+(ok?'✅ 任务完成':'🤔 差一点，再核对一下')+'</h3>'+
+    '<p>你的答案：<code style="background:rgba(255,255,255,.1);padding:2px 7px;border-radius:6px">'+esc(v||"—")+'</code></p>'+
+    '<p style="margin-top:10px">你刚才亲手跑了一遍 <b>思考 → 调用工具 → 观察 → 再思考</b> 的循环：'+steps+' 步、'+calls+' 次工具调用。<br>'+extra+'</p>'+
+    '<p style="margin-top:10px">关键在哪？<b>工具是死的，决定是活的。</b>每一步「下一步调什么、传什么」，就是 LLM 在干的那件事。</p>'+
+    '<p style="margin-top:10px">把这个「决定」换成一次模型调用，你就得到了真 Agent —— 其余部分一模一样。</p>';
+  el.className = "result show";
+  if(el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function hint(){
+  if(cur<0){ alert("先选一个任务"); return; }
+  alert("💡 " + TASKS[cur].hint.replace(/<\/?code>/g,'"'));
+}
+
+/* 机器替你走一遍：演示「把大脑换成 LLM」之后的样子 */
+function autoRun(){
+  if(cur<0){ alert("先选一个任务"); return; }
+  pick(cur);
+  const plan = [
+    ["01", [["calculator","365 * 24"]], "8760"],
+    ["02", [["lookup","三体字数"],["lookup","红楼梦字数"],["calculator","880000 - 730000"]], "150000"],
+    ["03", [["calculator","1410000000 / 365"]], "3863013.7"],
+    ["04", [["lookup","珠峰高度"]], "8848.86"]
+  ].find(p=>p[0]===TASKS[cur].n);
+  if(!plan) return;
+  let i = 0;
+  const tick = ()=>{
+    if(i < plan[1].length){
+      const [tk,ar] = plan[1][i++];
+      document.getElementById("tool").value = tk;
+      document.getElementById("arg").value = ar;
+      syncTip(); act();
+      setTimeout(tick, 620);
+    } else {
+      setTimeout(()=>{
+        steps++;
+        push("ans","机器给出答案","<code>"+plan[2]+"</code>");
+        document.getElementById("cnt").textContent = steps;
+        showResult(true, plan[2]);
+      }, 620);
+    }
+  };
+  tick();
+}
+
+pick(0);
+</script>
+</body>
+</html>
