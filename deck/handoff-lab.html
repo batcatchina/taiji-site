@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>交接实验室 · 你的上下文资产能被接住吗</title>
+<style>
+:root{
+  --bg:#080d1a; --tx:#e8eefc; --mut:#9fb0cc; --line:rgba(255,255,255,.11);
+  --acc:#22d3ee; --acc2:#a78bfa; --warn:#fbbf24; --bad:#f87171; --ok:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.7 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  padding:26px 18px 60px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto}
+.kicker{font-size:12.5px;letter-spacing:.16em;color:var(--acc);margin-bottom:8px}
+h1{font-size:clamp(23px,4vw,36px);line-height:1.25;margin-bottom:10px}
+.grad{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mut);font-size:14.5px;max-width:760px}
+.hero{border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:14px;padding:14px 16px;margin:20px 0 24px;
+  background:rgba(34,211,238,.06);font-size:14.5px;color:var(--mut)}
+.hero b{color:var(--tx)}
+
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-bottom:22px}
+.task{border:1px solid var(--line);border-radius:14px;padding:14px 15px;cursor:pointer;transition:.16s;background:rgba(255,255,255,.025)}
+.task:hover{border-color:var(--acc);transform:translateY(-2px)}
+.task.on{border-color:var(--acc);background:rgba(34,211,238,.1)}
+.task .n{font-size:11px;color:var(--acc);letter-spacing:.1em}
+.task h3{font-size:15px;margin:4px 0 5px}
+.task p{font-size:12.5px;color:var(--mut);line-height:1.6}
+.task .done{float:right;font-size:11px;color:var(--ok)}
+
+.hintbar{font-size:13px;color:var(--mut);border:1px dashed var(--line);border-radius:11px;
+  padding:10px 13px;margin-bottom:16px;background:#0d1426}
+.hintbar b{color:var(--acc)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.panel{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(255,255,255,.025)}
+.panel h2{font-size:13px;color:var(--acc);letter-spacing:.08em;margin-bottom:4px;font-weight:600}
+.panel .sub{font-size:12px;color:var(--mut);margin-bottom:12px}
+
+.card{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:9px;cursor:pointer;
+  font-size:13.5px;line-height:1.65;transition:.15s;background:#0d1426;position:relative}
+.card:hover{border-color:var(--acc2)}
+.card.sel{border-color:var(--acc);background:rgba(34,211,238,.12);box-shadow:0 0 0 1px var(--acc)}
+.card.placed{opacity:.55}
+.card .tag{position:absolute;right:9px;top:8px;font-size:10.5px;color:var(--mut);border:1px solid var(--line);
+  padding:1px 6px;border-radius:6px;background:var(--bg)}
+
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bin{border:1px solid var(--line);border-radius:12px;padding:11px 12px;min-height:78px;cursor:pointer;transition:.15s;background:#0d1426}
+.bin:hover{border-color:var(--acc)}
+.bin.hot{border-color:var(--acc);background:rgba(34,211,238,.1)}
+.bin.off{opacity:.28;cursor:not-allowed}
+.bin.need{border-color:var(--warn);background:rgba(251,191,36,.08)}
+.bin h4{font-size:12.5px;color:var(--acc);margin-bottom:2px}
+.bin .d{font-size:11px;color:var(--mut);line-height:1.5;margin-bottom:6px}
+.bin .n{font-size:11px;color:var(--tx)}
+.bin ul{list-style:none;margin-top:5px}
+.bin li{font-size:11.5px;color:var(--mut);padding:2px 0;border-top:1px dashed var(--line);line-height:1.5}
+
+.row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+button{flex:1;min-width:108px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:var(--tx);font:14px inherit;cursor:pointer;transition:.15s}
+button:hover{border-color:var(--acc);color:var(--acc)}
+button.pri{background:linear-gradient(92deg,var(--acc),var(--acc2));color:#06121f;border:none;font-weight:600}
+button.pri:hover{opacity:.9;color:#06121f}
+button.gh{background:transparent}
+
+.report{border-radius:14px;padding:16px;margin-top:18px;display:none;border:1px solid var(--line)}
+.report.show{display:block}
+.report.pass{border-color:var(--ok);background:rgba(52,211,153,.08)}
+.report.fail{border-color:var(--warn);background:rgba(251,191,36,.07)}
+.report.danger{border-color:var(--bad);background:rgba(248,113,113,.09)}
+.report h3{font-size:16px;margin-bottom:10px}
+.report.pass h3{color:var(--ok)} .report.fail h3{color:var(--warn)} .report.danger h3{color:var(--bad)}
+.report .say{border-left:2px solid var(--acc);padding:2px 0 2px 14px;margin:10px 0;font-size:14px;color:var(--tx);line-height:1.8}
+.report .say b{color:var(--acc)}
+.report li{font-size:13.5px;color:var(--mut);line-height:1.75;margin:7px 0;list-style:none;padding-left:20px;position:relative}
+.report li::before{content:'›';position:absolute;left:4px;color:var(--acc)}
+.report li.bad{color:#fca5a5} .report li.bad::before{content:'⚠';left:0;color:var(--bad)}
+.report li.ok{color:var(--tx)} .report li.ok::before{content:'✓';left:0;color:var(--ok)}
+.report .why{font-size:12.5px;color:var(--mut);margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+
+.failbox{border:1px solid var(--warn);border-radius:12px;padding:13px 15px;margin-top:12px;background:rgba(251,191,36,.06)}
+.failbox h4{font-size:13px;color:var(--warn);margin-bottom:7px}
+.failbox .item{font-size:13px;line-height:1.7;padding:5px 0;border-top:1px dashed var(--line)}
+.failbox .item:first-of-type{border-top:none}
+.failbox .item em{color:var(--mut);font-style:normal;font-size:12.5px;display:block}
+
+pre{background:#0d1426;border:1px solid var(--line);border-radius:11px;padding:13px;font-size:12px;
+  overflow-x:auto;line-height:1.65;color:var(--mut);white-space:pre-wrap;word-break:break-word;margin-top:10px}
+.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--mut);text-align:center}
+.foot a{color:var(--acc);text-decoration:none}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .bins{grid-template-columns:1fr}
+  button{min-width:0}
+  .card .tag{position:static;display:inline-block;margin-top:6px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">Context Asset Lab · 交接实验室</div>
+  <h1>你的项目，能被一个<span class="grad">失忆的 Agent</span>接住吗</h1>
+  <p class="lead">这套模型真正的用处不在「让 AI 跑起来」，而在<b style="color:var(--tx)">让一份上下文资产换手之后不失真</b>。
+     你分拣，机器验收——它会当面告诉你哪儿接不住。</p>
+
+  <div class="hero">
+    假设明天你要把这个项目交给别人（或另一个 AI）：<b>他对你做过的一切一无所知</b>，
+    手上只有你留下的那几份东西。<b>缺什么，他就答不出哪一问。</b>
+    这就是下面要练的——不是记住八个格子，而是亲手体会每个格子为什么必须有。
+  </div>
+
+  <h2 style="font-size:13px;color:var(--acc);letter-spacing:.08em;margin-bottom:10px">选一个场景</h2>
+  <div class="tasks" id="tasks"></div>
+
+  <div class="hintbar" id="hintbar"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>待分拣的信息</h2>
+      <div class="sub">先看左边的卡片，想清楚它属于哪一类，再点右边的格子放进去。放错可以点回来。</div>
+      <div id="pool"></div>
+    </div>
+    <div class="panel">
+      <h2>太极的八个位置</h2>
+      <div class="sub">灰色的格子在这个场景里用不上。</div>
+      <div class="bins" id="bins"></div>
+      <div class="row">
+        <button class="pri" onclick="judge()">▶ 交给另一个 Agent</button>
+        <button class="gh" onclick="resetAll()">🔄 重来</button>
+        <button class="gh" onclick="exp()">📤 导出交接包</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report" id="rep"></div>
+
+  <div class="foot">
+    <a href="index.html">← 回到讲稿</a> · 
+    <a href="practice.html">热身练习：当一次 Agent 的大脑</a><br>
+    太极·点圆 MRS-EV 统一上下文资产模型 · 上下文 = ●(M|R|S) + ○(E1|E2/E3_ref)，真值 ∈ Vault
+  </div>
+</div>
+
+<script>
+/* ---------- 八个位置 ---------- */
+const BINS = [
+  {k:'M',  n:'M 内核·原则',   d:'不可协商的是非标准。换台机器、换个项目还成立，才配进内核。'},
+  {k:'R',  n:'R 协议·规则',   d:'怎么读、什么顺序、什么格式。双方约定——不约定就等于没有。'},
+  {k:'S',  n:'S 状态·当下',   d:'现在在哪、卡在哪、下一步。最容易过期，也最容易忘。'},
+  {k:'E1', n:'E1 外延·可换',  d:'工具、库、选型。拔掉能换，换了对内核无感。'},
+  {k:'E2', n:'E2 外延·内部',  d:'公司内网地址、私有库、团队约定。出了这个圈子就失效。'},
+  {k:'E3', n:'E3 外延·外部',  d:'第三方服务。仓库里只放它的<b>引用名</b>，真值不在这一层。'},
+  {k:'V',  n:'Vault·真值',    d:'密钥、口令、隐私数据的明文。不进仓库、不进对话。'},
+  {k:'X',  n:'不进上下文',    d:'噪声、情绪、与项目无关的信息。漏进来比漏掉更贵。'}
+];
+
+/* ---------- 三个场景 ---------- */
+const SCENES = [
+{
+  id:0, t:'第一关', h:'四件必备',
+  p:'一个同事要接手你的项目。先把最要命的四样东西分对——少一样他就动不了。',
+  bins:['M','R','S','V','X'],
+  cards:[
+    {t:'「已发布的原则清单不许修改，只能在末尾追加；要改必须先写明理由。」', a:['M'],
+     w:'这是关于「如何对待内核」的规则，换到任何项目都成立——是原则，不是进度。'},
+    {t:'「开工前必须按 Memory.md → Readme.md → State.md 的顺序读完再动手。」', a:['R'],
+     w:'读取顺序是双方约定出来的。约定本身不产生内容，但它决定了内容能不能被读懂。'},
+    {t:'「已完成 6/10：工具跑通了，卡在向量库连接超时，下一步换端口重试。」', a:['S'],
+     w:'有保质期。过期就是假的——可正因为容易过期，它最常被忘掉，而它恰恰是接手的人最需要的。'},
+    {t:'「OpenAI Key 的真实值：sk-proj-9f2bT…（32 位）」', a:['V'],
+     w:'真值。仓库和对话里只该出现它的名字 E3_LLM_API_KEY，值锁在 Vault 里。'},
+    {t:'「这个 bug 折磨了我三小时，烦死了，明天再也不想碰它。」', a:['X'],
+     w:'情绪是真的，但不是上下文资产。Agent 读到它只会污染判断——这就是「漏进来比漏掉更贵」。'},
+    {t:'「接口返回的 JSON 里，result 字段可能为空，必须先判空再取值。」', a:['M'],
+     w:'一条硬性的对错标准，不属于某次运行的临时情况，所以是原则不是状态。'}
+  ]
+},
+{
+  id:1, t:'第二关', h:'外延三兄弟',
+  p:'现在把工具、内部资源、外部服务分开。这三样放混了，接手的人会找错地方。',
+  bins:['M','R','S','E1','E2','E3','V','X'],
+  cards:[
+    {t:'「向量检索用 pgvector，也可以换成 Milvus，不影响上层。」', a:['E1'],
+     w:'明确说了「可以换」，且换了不影响上层——标准的 E1 可插拔外延。'},
+    {t:'「公司内网的 Milvus 地址：10.20.31.7:19530，只能在内网访问。」', a:['E2'],
+     w:'私有地址、出了这个圈子就失效。半内部资源，是 E2 而非 E1，更不能当 M。'},
+    {t:'「调用 OpenAI 的 embedding 接口做向量化。」', a:['E3'],
+     w:'第三方外部服务。注意这一层只描述「调什么」，不写「用什么身份调」——那是 Vault 的事。'},
+    {t:'「OPENAI_API_KEY 的明文：sk-proj-9f2bT…」', a:['V'],
+     w:'上一层的引用名在这里才有真身。两层必须分开：引用名可以公开，真值不可以。'},
+    {t:'「本项目的目标：让不懂 SQL 的同事能用中文查数据。」', a:['M'],
+     w:'北极星。所有取舍都拿它衡量，所以它属于内核——不是需求列表里的一行。'},
+    {t:'「所有提交信息用中文，格式：动词+对象。」', a:['R'],
+     w:'一种格式约定。约定错了不影响对错，但会让协作变乱，所以是协议不是原则。'},
+    {t:'「当前版本 v1.2，上一次 PR 是 #47，还没合并。」', a:['S'],
+     w:'当下所处位置的快照。明天就可能是 v1.3，所以它活不长，但不能没有。'},
+    {t:'「隔壁组也在做类似的东西，不过是上个月的事了。」', a:['X'],
+     w:'与本项目的上下文资产无关。留着只会稀释真正重要的信息。'}
+  ]
+},
+{
+  id:2, t:'第三关', h:'陷阱场',
+  p:'这一关全是容易放错的地方。别慌——放错了，失忆 Agent 会当场告诉你会发生什么。',
+  bins:['M','R','S','E1','E2','E3','V','X'],
+  cards:[
+    {t:'「必须用 PostgreSQL —— 别的数据库一概不许用。」', a:['E1'],
+     w:'陷阱：语气很强硬，容易被当成原则。但它是<b>技术选型</b>，选型可以改；真正的原则是「如何修改约束」这件事本身要不要走流程。'},
+    {t:'「数据库口令：Tx#82kd91。」', a:['V'],
+     w:'真值。哪怕它看起来只是个项目内部的东西——一旦写进文件，它就会进 clone、进截图、进云端模型。'},
+    {t:'「周五下午老板要看演示，PPT 还没做。」', a:['S'],
+     w:'有明确的时间边界、会过期，属于当下状态。它不影响是非，只影响优先级。'},
+    {t:'「对外接口的调用凭证统一从环境变量读取，禁止硬编码。」', a:['M'],
+     w:'这是一条安全原则，跨越所有项目和所有技术栈——典型内核。'},
+    {t:'「本月 API 账单还剩 320 元。」', a:['S'],
+     w:'会变的数字。它不是「永远如此」的约束，所以是状态不是原则。'},
+    {t:'「如果连续三次同一种报错，就把它提炼成一条原则写进 Memory。」', a:['R'],
+     w:'这是关于「怎么沉淀经验」的流程规定，属于元协议——规定动作的下限，不规定结论。'},
+    {t:'「别用 E2 层的内部地址去连外部服务，会超时。」', a:['M'],
+     w:'一条边界原则，讲清了 E2 与 E3 之间的硬边界。这类「什么不能串」的话正是内核该管的。'},
+    {t:'「上次部署时忘了关 debug，被运维说了一顿。」', a:['X'],
+     w:'是一次事故的叙事，不是可复用的资产。要留的是「部署前必须关 debug」这条原则，而不是这段尴尬。'}
+  ]
+}
+];
+
+let si = 0, placed = {}, picked = null, done = {};
+
+/* ---------- 渲染 ---------- */
+function cur(){ return SCENES[si]; }
+
+function drawTasks(){
+  const el = document.getElementById('tasks');
+  el.innerHTML = '';
+  SCENES.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'task' + (i===si?' on':'');
+    d.innerHTML = '<div class="n">'+s.t+'</div><h3>'+s.h+ (done[i]?'<span class="done">✓ 已通过</span>':'') +'</h3><p>'+s.p+'</p>';
+    d.onclick = ()=>{ si=i; picked=null; drawTasks(); drawHint(); drawPool(); drawBins(); hideRep(); };
+    el.appendChild(d);
+  });
+}
+
+function drawHint(){
+  document.getElementById('hintbar').innerHTML =
+    '<b>操作：</b>先点左边一张卡片，再点右边一个格子放进去；点已放好的卡片可以取回来。全部放完再点「交给另一个 Agent」。';
+}
+
+function drawPool(){
+  const s = cur(), el = document.getElementById('pool');
+  el.innerHTML = '';
+  // 未分拣的：正常卡片
+  const left = s.cards.filter((c,i)=>placed[i]===undefined);
+  left.forEach(c=>{
+    const i = s.cards.indexOf(c);
+    const d = document.createElement('div');
+    d.className = 'card' + (picked===i?' sel':'');
+    d.innerHTML = c.t;
+    d.onclick = ()=>{ picked = (picked===i? null : i); drawPool(); drawBins(); };
+    el.appendChild(d);
+  });
+  // 已放置的：半透明留在下面，点一下取回
+  Object.keys(placed).forEach(k=>{
+    const i = +k;
+    const d = document.createElement('div');
+    d.className = 'card placed';
+    d.innerHTML = s.cards[i].t + '<span class="tag">'+ labelOf(placed[i]) +' · 点此取回</span>';
+    d.onclick = ()=>{ delete placed[i]; drawPool(); drawBins(); hideRep(); };
+    el.appendChild(d);
+  });
+  if(!left.length && Object.keys(placed).length){
+    const tip = document.createElement('div');
+    tip.style.cssText = 'color:var(--mut);font-size:12.5px;padding:8px 0';
+    tip.innerHTML = '全部放完了。点「交给另一个 Agent」验收；要改就点上面的卡片取回。';
+    el.appendChild(tip);
+  }
+}
+
+function drawBins(){
+  const s = cur(), el = document.getElementById('bins');
+  el.innerHTML = '';
+  BINS.forEach(b=>{
+    const off = s.bins.indexOf(b.k) < 0;
+    const items = Object.keys(placed).filter(i=>placed[i]===b.k);
+    const d = document.createElement('div');
+    d.className = 'bin' + (off?' off':'') + (picked!==null && !off?' hot':'');
+    d.innerHTML = '<h4>'+b.n+'</h4><div class="d">'+b.d+'</div>'+
+      '<div class="n">'+items.length+' 条</div>'+
+      '<ul>'+items.map(i=>'<li>'+s.cards[i].t.slice(0,26)+'…</li>').join('')+'</ul>';
+    if(!off) d.onclick = ()=>{
+      if(picked!==null){ placed[picked]=b.k; picked=null; drawPool(); drawBins(); hideRep(); }
+    };
+    el.appendChild(d);
+  });
+}
+
+function labelOf(k){ const b = BINS.find(x=>x.k===k); return b? b.n.split('·')[0].trim() : k; }
+
+function hideRep(){ document.getElementById('rep').className = 'report'; }
+
+/* ---------- 验收：失忆 Agent 的回复 ---------- */
+function judge(){
+  const s = cur(), rep = document.getElementById('rep');
+  const cnt = {}; BINS.forEach(b=>cnt[b.k]=[]);
+  Object.keys(placed).forEach(i=>{ cnt[placed[i]].push(+i); });
+
+  const missing = s.cards.filter((c,i)=>placed[i]===undefined).length;
+  if(missing){ rep.className='report fail show';
+    rep.innerHTML = '<h3>还没分拣完</h3><p style="color:var(--mut);font-size:14px">还有 '+missing+' 张卡片没放。'+
+      '没放的信息，接手的人<b>看不到</b>——它不存在。</p>'; return; }
+
+  const wrong = [], lines = [], bad = [];
+  s.cards.forEach((c,i)=>{
+    if(c.a.indexOf(placed[i]) < 0) wrong.push(i);
+  });
+
+  // Vault 真值是否泄漏进其它层（针对所有关卡的通用检查）
+  const vaultCardIdx = s.cards.map((c,i)=>c.a.indexOf('V')>=0? i : -1).filter(i=>i>=0);
+  vaultCardIdx.forEach(i=>{
+    if(placed[i] !== 'V') bad.push('你把<b>密钥明文</b>放进了「'+labelOf(placed[i])+'」。'+
+      '这份凭证会出现在每一次 clone、每一张截图、每一次云端对话里。按最小权限与「泄露即轮换」原则——<b>它现在就必须吊销</b>。');
+  });
+  // E2 内网/私有地址进了 M？
+  s.cards.forEach((c,i)=>{
+    if(c.a[0]==='E2' && placed[i]==='M') bad.push('内网地址被你写成了<b>原则</b>。换家公司这条「原则」就是毒药——它会让接手的人拿着失效的地址硬撞。');
+  });
+  // 噪声进来了
+  s.cards.forEach((c,i)=>{
+    if(c.a[0]==='X' && placed[i]!=='X') bad.push('「'+c.t.slice(1,14)+'…」这类内容是<b>噪声</b>，你却把它留在了上下文里。它不会帮接手的人，只会稀释真正重要的信息。');
+  });
+
+  const noM = !cnt.M.length, noR = !cnt.R.length, noS = !cnt.S.length;
+
+  if(noM) lines.push('你没有给我任何<b>原则</b>。我可能会顺手重构你的核心文件——因为我不知道哪些是不能碰的。');
+  if(noR) lines.push('几份文件摆在我面前，我不知道<b>先读哪个</b>、它们之间什么关系。我会按运气挑一本开始，然后理解错一半。');
+  if(noS) lines.push('我不知道<b>上次做到哪里</b>。最安全的选择是从第一步重做一遍——你三天的工作量我要再烧一次。');
+
+  if(bad.length || lines.length){
+    rep.className = 'report ' + (bad.length?'danger':'fail') + ' show';
+    rep.innerHTML = '<h3>'+(bad.length?'⚠ 严重：接不住，而且有泄露':'接不住')+'</h3>'+
+      '<div class="say" style="border-color:var(--warn)">失忆 Agent 说：<br>'+
+        (bad.length? bad.map(x=>'· '+x).join('<br>')+'<br>' : '') +
+        lines.map(x=>'· '+x).join('<br>') +
+      '</div>'+
+      '<p class="why">模型的八条原则是环环相扣的：<b>缺的不是一份文件，是一条让对方能继续动作的因果链。</b>'+
+      '补上再试。</p>'+ wrongList(wrong, s);
+    return;
+  }
+
+  if(wrong.length){
+    rep.className='report fail show';
+    rep.innerHTML = '<h3>勉强接住了，但有东西放错位置</h3>'+
+      '<div class="say">失忆 Agent 说：<br>· 我能开工了。不过有几处你放的位置不对，我读的时候会多绕几步——'+
+      '现在误导还小，等项目变大就会变成真正的坑。</div>'+ wrongList(wrong, s);
+    return;
+  }
+
+  done[s.id] = true; drawTasks();
+  rep.className='report pass show';
+  rep.innerHTML = '<h3>✓ 接住了</h3>'+
+    '<div class="say">失忆 Agent 说：<br>'+
+      '· <b>现在在哪</b>：我看得到了<br>'+
+      '· <b>卡在哪</b>：我知道了<br>'+
+      '· <b>下一步</b>：我接得上<br>'+
+      '· <b>我不能动什么</b>：我清楚了<br>'+
+      '开工。</div>'+
+    '<p class="why">这一关的关键不是「分对八个格子」，而是你第一次亲眼确认了：<b>交接这件事是可以被验证的。</b>'+
+    '模型把这四句话从「希望对方问出来」变成了「文件里必须有」，这就是它的全部价值。</p>'+
+    '<div style="margin-top:12px;font-size:13px;color:var(--mut)">试试导出交接包，粘到一个全新的 AI 对话里——'+
+    '那才是最真实的验收。'+
+    (s.id<SCENES.length-1 ? ' <span style="color:var(--acc)">或直接进下一关 →</span>' : '')+'</div>';
+}
+
+function wrongList(wrong, s){
+  if(!wrong.length) return '';
+  const need = new Set();
+  wrong.forEach(i=>s.cards[i].a.forEach(k=>need.add(k)));
+  return '<div class="failbox"><h4>这几张值得再看一眼</h4>'+
+    wrong.map(i=>'<div class="item">'+s.cards[i].t+'<em>它该在：'+
+      s.cards[i].a.map(labelOf).join(' 或 ')+'。'+s.cards[i].w+'</em></div>').join('')+'</div>';
+}
+
+/* ---------- 导出 ---------- */
+function exp(){
+  const s = cur(), rep = document.getElementById('rep');
+  const g = k => Object.keys(placed).filter(i=>placed[i]===k)
+    .map(i=>'- '+s.cards[i].t.replace(/^[「]|」$/g,'')).join('\n') || '- （空）';
+
+  const md = '# HANDOFF —— 项目交接包（本练习生成）\n\n'+
+    '> 生成时间：'+new Date().toLocaleString('zh-CN')+'　来源：交接实验室 · '+s.t+' '+s.h+'\n\n'+
+    '## 一、内核 M（不可协商）\n'+g('M')+'\n\n'+
+    '## 二、协议 R（怎么读）\n'+g('R')+'\n\n'+
+    '## 三、状态 S（现在在哪）\n'+g('S')+'\n\n'+
+    '## 四、外延 E1 可替换\n'+g('E1')+'\n\n'+
+    '## 五、外延 E2 内部资源\n'+g('E2')+'\n\n'+
+    '## 六、外延 E3 外部服务（仅引用名）\n'+g('E3')+'\n\n'+
+    '## 七、Vault 引用名清单（真值不入本文件）\n'+g('V')+'\n\n'+
+    '## 八、接手校验四问\n'+
+    '1. 现在在哪？\n2. 卡在哪？\n3. 下一步是什么？\n4. 什么绝对不能动？\n\n'+
+    '> 把这四句答不上来的那一句，回去补对应区块。\n';
+
+  const esc = md.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  rep.className = 'report show';
+  rep.innerHTML = '<h3 style="color:var(--acc)">📤 你的交接包</h3>'+
+    '<p style="font-size:13.5px;color:var(--mut)">复制下面这段，粘到一个<b style="color:var(--tx)">全新的</b> AI 对话里，'+
+    '只问它那四个问题。它能答上来，你的资产就真的成型了。</p>'+
+    '<pre id="mdout">'+esc+'</pre>'+
+    '<div class="row"><button class="pri" onclick="cp()">📋 复制</button></div>';
+}
+
+function cp(){
+  const t = document.getElementById('mdout');
+  if(!t) return;
+  const r = document.createRange(); r.selectNodeContents(t);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  try{ document.execCommand('copy'); }catch(e){}
+  alert('已复制。去开一个全新的对话，只问那四句话。');
+}
+
+function resetAll(){ placed={}; picked=null; drawPool(); drawBins(); hideRep(); }
+
+drawTasks(); drawHint(); drawPool(); drawBins();
+</script>
+</body>
+</html>
