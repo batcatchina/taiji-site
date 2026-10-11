@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>K 硬核资产 · 橱窗与货架 · MRS-EV</title>
+<meta name="description" content="MRS-EV 模型 K 硬核资产层：K_pub 橱窗（可被 AI 检索发现）与 K_pri 货架（可见价签，成交后交付）。">
+<link rel="alternate" type="text/plain" href="/llms.txt">
+<link rel="canonical" href="https://taiji.zheng-he.top/deck/k.html">
+
+<!-- ===== Schema.org JSON-LD =====
+     为什么加这个：核实 2026-10-06，llms.txt 虽被 AI 编程工具读取，但主流 AI 搜索
+     爬虫（GPTBot / ClaudeBot / PerplexityBot / Google-Extended）基本绕过它直接抓 HTML，
+     Google 明确不支持该文件。JSON-LD 是搜索引擎与 AI 抽取答案更稳的通道。
+     纪律：以下字段全部与 K 层资产记录一致，不得凭空写。唯一事实源是 kpub-*.json。 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://taiji.zheng-he.top/#website",
+      "name": "MRS-EV 太极·点圆统一上下文资产模型",
+      "url": "https://taiji.zheng-he.top/",
+      "inLanguage": "zh-CN",
+      "description": "太极模型 K 硬核资产层。K_pub 橱窗可被 AI 检索发现，K_pri 货架可见价签、成交后交付。"
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://taiji.zheng-he.top/deck/k.html#page",
+      "name": "K 硬核资产 · 橱窗与货架",
+      "url": "https://taiji.zheng-he.top/deck/k.html",
+      "isPartOf": { "@id": "https://taiji.zheng-he.top/#website" },
+      "inLanguage": "zh-CN",
+      "description": "K 层资产橱窗。每件资产均带时效声明（valid_until）与四栏可证伪性边界（not_for / weak_at / requires_human / verify）。**件数与片段数以 /k/index.json 的 counts 字段为准，此处不写死数字** —— 静态标记里写死的件数从v1.7.0起就已漂移，而抓 JSON-LD 的爬虫看不到运行时注入的那份，改一次就得跟一次。"
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://taiji.zheng-he.top/k/index.json#dataset",
+      "name": "MRS-EV K 层结构化资产索引",
+      "url": "https://taiji.zheng-he.top/k/index.json",
+      "inLanguage": "zh-CN",
+      "description": "机器可读索引。含 counts / kinds / tags / entities / terms / freshness 六组字段与全部资产完整记录（件数见 counts，此处不写死）。关系完整性由 kindex.py 断链检测保障，字段契约由 JSON Schema 校验。",
+      "creator": { "@id": "https://taiji.zheng-he.top/#website" },
+      "distribution": [
+        {
+          "@type": "DataDownload",
+          "encodingFormat": "application/json",
+          "contentUrl": "https://taiji.zheng-he.top/k/index.json"
+        },
+        {
+          "@type": "DataDownload",
+          "encodingFormat": "text/plain",
+          "contentUrl": "https://taiji.zheng-he.top/llms.txt"
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- 资产级 Article 标记：与下方 JS 注入的 pub 列表同源，
+     这里只声明「这一页是什么类型的内容集合」，逐件资产的 Article 标记由脚本生成。 -->
+<script type="application/ld+json" id="k-assets-ld"></script>
+<style>
+:root{--bg:#0b1020;--bg2:#111a33;--card:#16203c;--tx:#e8eefc;--mut:#9db0d4;
+--acc:#22d3ee;--acc2:#a78bfa;--gold:#f0c674;--line:rgba(255,255,255,.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1100px 700px at 15% -10%,#1a2450 0%,var(--bg) 55%) fixed;
+color:var(--tx);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+line-height:1.7;-webkit-text-size-adjust:100%}
+.wrap{max-width:980px;margin:0 auto;padding:44px 22px 80px}
+.kicker{font-size:12px;letter-spacing:.2em;color:var(--acc);font-weight:700;margin-bottom:12px}
+h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.2}
+h2{font-size:clamp(18px,3.2vw,24px);font-weight:800;margin:46px 0 8px}
+.grad{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mut);font-size:clamp(14px,2vw,16.5px);margin-top:14px;max-width:720px}
+.quote{margin-top:22px;padding:15px 20px;border-left:3px solid var(--acc);border-radius:0 12px 12px 0;
+background:rgba(34,211,238,.09);font-size:15px}
+.quote b{color:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:18px}
+.kcard{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+border-radius:15px;padding:20px;display:flex;flex-direction:column;transition:.2s;align-self:start}
+.kcard:hover{border-color:var(--acc);transform:translateY(-2px)}
+.kcard.wide{grid-column:1/-1}
+.kcard .id{font-size:11px;color:var(--mut);letter-spacing:.06em;font-family:ui-monospace,monospace}
+.kcard h3{font-size:16.5px;margin:7px 0 9px;line-height:1.4}
+.kcard p{font-size:13.3px;color:var(--mut);flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.tag{font-size:11px;padding:3px 9px;border-radius:7px;background:rgba(34,211,238,.10);
+border:1px solid rgba(34,211,238,.22);color:var(--acc)}
+.ents{font-size:11px;color:var(--mut);margin-top:9px;opacity:.8}
+.sects{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.sects summary{font-size:12px;color:var(--acc);cursor:pointer;font-weight:700;user-select:none}
+.sec{margin-top:9px;padding:9px 11px;background:rgba(255,255,255,.03);border-radius:9px;
+border-left:2px solid rgba(34,211,238,.4)}
+.sec b{font-size:12.5px;color:var(--tx);display:block;margin-bottom:3px}
+.sec p{font-size:12px;color:var(--mut);line-height:1.6}
+.secterms{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.secterms span{font-size:10px;padding:1px 7px;border-radius:5px;
+background:rgba(167,139,250,.12);color:var(--acc2);border:1px solid rgba(167,139,250,.22)}
+.sects[open]{max-height:none}
+.secgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-top:9px}
+.badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.05em;
+padding:3px 9px;border-radius:6px;margin-bottom:10px}
+.b-pub{background:rgba(34,211,238,.14);color:var(--acc);border:1px solid rgba(34,211,238,.3)}
+.b-trace{background:rgba(167,139,250,.16);color:var(--acc2);border:1px solid rgba(167,139,250,.35)}
+.b-goods{background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.35)}
+.kindnote{font-size:11px;color:var(--mut);margin-top:4px;font-style:italic}
+
+/* 时效标记：AI 引用过期信息比不知道更糟，所以这一眼必须看到 */
+.fresh{font-size:10.5px;margin-top:6px;padding:3px 8px;border-radius:6px;
+  display:inline-block;font-weight:700;letter-spacing:.02em}
+.f-ok{background:rgba(255,255,255,.04);color:var(--mut);border:1px solid var(--line)}
+.f-warn{background:rgba(240,198,116,.14);color:var(--gold);border:1px solid rgba(240,198,116,.35)}
+.f-exp{background:rgba(248,113,113,.16);color:#f87171;border:1px solid rgba(248,113,113,.42)}
+.f-none{background:rgba(248,113,113,.08);color:#c98b8b;border:1px dashed rgba(248,113,113,.3)}
+
+/* 边界与可证伪性：只讲优点的资产等于广告，AI 不敢推荐 */
+.bnds{margin-top:11px;border:1px solid rgba(248,113,113,.22);border-radius:9px;
+  background:rgba(248,113,113,.035);padding:9px 12px}
+.bnds>summary{cursor:pointer;font-size:12px;font-weight:700;color:#f0a0a0;
+  list-style:none;user-select:none}
+.bnds>summary::-webkit-details-marker{display:none}
+.bnds>summary::before{content:'▸ ';display:inline-block;transition:transform .15s}
+.bnds[open]>summary::before{transform:rotate(90deg)}
+.bnd{margin-top:10px;padding-left:10px;border-left:2px solid var(--line)}
+.bnd>b{font-size:11.5px;letter-spacing:.03em}
+.bnd ul{margin:5px 0 0;padding-left:17px}
+.bnd li{font-size:12.5px;color:var(--mut);line-height:1.65;margin-bottom:4px}
+.bn-for>b{color:#f0a0a0} .bn-for{border-left-color:rgba(248,113,113,.5)}
+
+/* 高危内容：不折叠。健康/金融/法律类，藏在折叠区等于没写 */
+.alarm{margin-top:12px;padding:11px 13px;border-radius:9px;
+  border:1px solid rgba(248,113,113,.5);background:rgba(248,113,113,.09)}
+.alarm>b{display:block;font-size:12.5px;letter-spacing:.04em;color:#ff9b9b;margin-bottom:5px}
+.alarm p{margin:0;font-size:12.5px;line-height:1.7;color:var(--txt)}
+.alarm .more{margin-top:6px;font-size:11.5px;color:var(--mut);opacity:.85}
+.bn-weak>b{color:var(--gold)} .bn-weak{border-left-color:rgba(240,198,116,.5)}
+.bn-human>b{color:var(--acc2)} .bn-human{border-left-color:rgba(167,139,250,.5)}
+.bn-verify>b{color:#34d399} .bn-verify{border-left-color:rgba(52,211,153,.5)}
+
+.b-pri{background:rgba(240,198,116,.14);color:var(--gold);border:1px solid rgba(240,198,116,.3)}
+.pricetable{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px}
+.pricetable th,.pricetable td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.pricetable th{color:var(--gold);font-size:12px;font-weight:700}
+.pricetable td{color:var(--mut)} .pricetable td b{color:var(--tx)}
+.empty{color:var(--mut);font-size:13.5px;padding:20px;border:1px dashed var(--line);
+border-radius:12px;margin-top:14px;text-align:center}
+.card{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+border-radius:14px;padding:18px 20px;margin-top:16px}
+.card h4{font-size:14.5px;margin-bottom:8px}
+.card p,.card li{font-size:13.3px;color:var(--mut)}
+.card b{color:var(--tx)}
+pre{background:#080d1c;border:1px solid var(--line);border-radius:11px;padding:14px 16px;
+overflow-x:auto;font-size:12.5px;color:var(--mut);margin-top:12px}
+pre b{color:var(--acc)}
+a{color:var(--acc)}
+.foot{margin-top:52px;padding-top:22px;border-top:1px solid var(--line);
+font-size:12.5px;color:var(--mut);text-align:center}
+.pill{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;
+background:rgba(255,255,255,.05);border:1px solid var(--line);margin:2px}
+
+/* —— 检索栏（条目多了不靠翻，靠搜/筛）—— */
+.bar{display:flex;gap:12px;align-items:center;margin:18px 0 10px}
+.bar input{flex:1;background:#080d1c;border:1px solid var(--line);border-radius:11px;
+padding:12px 16px;color:var(--tx);font-size:14px;font-family:inherit;outline:none}
+.bar input:focus{border-color:var(--acc)}
+.bar input::placeholder{color:var(--mut);opacity:.7}
+.hits{font-size:12px;color:var(--mut);white-space:nowrap}
+.tagbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tagbar .tg{font-size:11.5px;padding:4px 11px;border-radius:20px;cursor:pointer;
+background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--mut);user-select:none}
+.tagbar .tg:hover{border-color:var(--acc);color:var(--acc)}
+.tagbar .tg.on{background:rgba(34,211,238,.16);border-color:var(--acc);color:var(--acc);font-weight:700}
+
+/* 卡片：默认收起，只留标题+标签 */
+.kcard .body{display:none;margin-top:10px}
+.kcard.open .body{display:block}
+.kcard .ttl{cursor:pointer;display:flex;align-items:flex-start;gap:8px}
+.kcard .ttl:hover h3{color:var(--acc)}
+.kcard .caret{color:var(--mut);font-size:11px;margin-top:5px;transition:.2s;flex:0 0 auto}
+.kcard.open .caret{transform:rotate(90deg);color:var(--acc)}
+.tgline{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.tgline .tag{font-size:10.5px;padding:2px 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="kicker">MRS-EV · K 硬核资产层</div>
+<h1>你怎样才能<span class="grad">被 AI 调用</span>？</h1>
+<p class="lead">AI 接管调用入口后，旧问题「怎么抢流量」变成了新问题「怎么被调走」。
+答案是把你的知识做成一份<b>结构化 + 索引化</b>的资产。它分两层：橱窗让人和 AI <b>知道你</b>，货架让人和 AI <b>能取走它</b>。</p>
+
+<div class="quote">
+<b>被调用即存在</b> —— 不能被机器检索的能力等于不存在；可被检索却不分级定价的私有资产等于送。
+</div>
+
+<h2 id="pub">橱窗 · K_pub<span class="grad">（可检索、可引用）</span></h2>
+<p class="lead">放在这里的东西，是愿意被看见的。AI 可以自由检索、引用、传播 —— 换回的是认知与信任。<br>
+<span style="font-size:13px">条目多了不靠翻 —— <b>搜 / 筛</b>。点标题才展开正文。</span></p>
+
+<div class="bar">
+  <input id="q" type="search" placeholder="搜索：标题 / 摘要 / 标签 / 术语 / 实体…" autocomplete="off">
+  <span id="hits" class="hits"></span>
+</div>
+<div class="tagbar" id="tagbar"></div>
+<div class="grid" id="pubgrid"></div>
+<div id="empty" class="empty" style="display:none">没有匹配的资产 —— 换个词，或清空筛选。</div>
+
+<h2 id="pri">货架 · K_pri<span class="grad">（价签可见，内容不外露）</span></h2>
+<p class="lead">这里挂着的是资产。你能看见它<b>是什么、能交付什么、怎么换</b>，但内容在库房 —— <b>成交之后才注入</b>。</p>
+<div id="prigrid"></div>
+
+<h2>这份索引怎么被机器用</h2>
+<div class="card">
+  <h4>三个出口，各喂一种读者</h4>
+  <table class="pricetable">
+    <tr><th>出口</th><th>喂谁</th><th>怎么用</th></tr>
+    <tr><td><a href="/llms.txt"><b>llms.txt</b></a></td><td>AI 爬虫 / 智能体</td><td>纯文本入口清单，最易被抓取</td></tr>
+    <tr><td><a href="/k/index.json"><b>index.json</b></a></td><td>程序 / 工具链</td><td>带标签反查表、实体表，可编程检索</td></tr>
+    <tr><td>本页</td><td>人</td><td>看得懂、可点击、可打听</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h4>索引长这样</h4>
+<pre>{
+  <b>"layer"</b>: "K",
+  <b>"pub"</b>: [ { "id": "kpub-mrs-ev-model",
+             "title": "MRS-EV 太极·点圆统一上下文资产模型",
+             "tags": ["上下文工程","智能体", ...],
+             "source": { "kind": "cloud", <b>"ref"</b>: "https://…" } } ],
+  <b>"pri"</b>: [ { "id": "kpri-…",
+             "price": { "what": "…", "deliver": "…", "how": "…" } } ]
+}</pre>
+  <p style="margin-top:10px">注意 <b>source 里只有 ref（如何取）</b>，没有原件。云端素材只读引用，本地素材只做结构化，<b>原件一律不落地</b>。</p>
+</div>
+
+<h2>答案型页面（直接对上提问）</h2>
+<div class="card">
+  <p style="margin:0 0 10px;font-size:13.5px;color:var(--mut)">索引是给工具查的；<b>答案是给提问者用的</b>。这类页面先给结论、再给可核实与不可核实的分界，配 <code>FAQPage</code> 结构化标记 —— 在 AI 答案里的被引概率远高于一篇结构完整的索引。</p>
+  <table class="pricetable">
+    <tr><th>页面</th><th>回答的问题</th><th>对应资产</th></tr>
+    <tr><td><a href="/answers/wei-zhong-bloodletting.html"><b>委中穴放血对皮肤病有效吗</b></a></td><td>有创操作的风险边界、<b>「牛皮癣」与银屑病不是一回事</b>、哪些主张可核实</td><td><code>kpub-wei-zhong-bloodletting</code></td></tr>
+  </table>
+  <p style="margin-top:10px;font-size:12.5px;color:var(--mut)">纪律：答案页<b>不得新增未核实主张</b> —— 每个问答都要能对回资产记录的某一段。FAQPage 是最容易被 AI 直接抽取播报的结构，一句失准就会被规模化复制，所以边界信息被刻意写进答案文本里，而不是只放在页面角落。</p>
+</div>
+
+<h2>边界（写在设计里）</h2>
+<div class="card">
+  <p><b>1. 原件不落地。</b>云端（网盘等）只记「如何取」的引用；本地素材直接加工成结构化描述，不留原件副本。</p>
+  <p style="margin-top:8px"><b>2. K_pri 内容不外露。</b>价签可见，真值在 Vault，成交才注入 —— 与 E3 同法。</p>
+  <p style="margin-top:8px"><b>3. 凭证走 E3。</b>任何取件凭证只留引用名，真值永不进体系。</p>
+</div>
+
+<div class="foot">
+  <span class="pill">MRS-EV v1.4</span>
+  <span class="pill">K 层实例</span>
+  <span class="pill">kindex.py 生成</span>
+  <div style="margin-top:12px">太极是展开，点圆是收敛 ｜ 第 268 行起：硬核资产（K）</div>
+</div>
+
+</div>
+
+<script>
+/* 页面直接读 index.json 渲染 —— 这样「索引」是唯一事实源，
+   页面不是手写副本。AI 改索引，页面自动跟着变。
+
+   条目多了不靠翻，靠 搜 / 筛：默认全部收起，只留标题+标签；
+   搜索覆盖 标题/摘要/标签/术语/实体，避免"上百个文档逐个翻"。 */
+let ALL=[], ACTIVE=new Set();
+
+fetch('/k/index.json').then(r=>r.json()).then(d=>{
+  // 把时效体检结果挂到每条记录上：页面渲染与 AI 判断用的是同一份事实
+  const fresh=d.freshness||{};
+  ALL = d.pub.filter(x=>!x._error).map(x=>Object.assign({},x,{_fresh: fresh[x.id]||null}));
+  buildTagbar(ALL);
+  render();
+  renderPri(d.pri.filter(x=>!x._error));
+  injectAssetLD(d, fresh);
+}).catch(e=>{
+  document.getElementById('pubgrid').innerHTML='<div class="empty">索引加载失败：'+e+'</div>';
+});
+
+/* 资产级 Article JSON-LD：逐件注入，字段全部取自 index.json（唯一事实源）
+   为什么动态生成而不是写死在 HTML 里：写死就会和资产记录漂移 ——
+   同一个错我们刚在 v1.6.1 犯过一次（schema 写了不跑、数据与契约脱节）。
+   这里从数据生成，资产改了标记自动跟着改。 */
+function injectAssetLD(d, fresh){
+  const host=document.getElementById('k-assets-ld');
+  if(!host) return;
+  const graph=(d.pub||[]).filter(x=>!x._error).map(x=>{
+    const f=fresh[x.id]||{};
+    const b=x.boundaries||{};
+    return {
+      "@type":"Article",
+      "@id":'https://taiji.zheng-he.top/deck/k.html#'+x.id,
+      "headline":x.title,
+      "description":x.summary,
+      "keywords":(x.tags||[]).join('、'),
+      "inLanguage":"zh-CN",
+      "articleSection":x.kind==='trace'?'迹（可验证行为记录）'
+                    :x.kind==='goods'?'货（纯交付物）':'料（结构化知识）',
+      "datePublished":x.updated||null,
+      "dateModified":x.updated||null,
+      "citation":(x.entities||[]).slice(0,6).join('、')||undefined,
+      /* 时效与边界写进标记：AI 抽取答案时能同时看到「这篇多久没复核」与「它不适用于什么」 */
+      "isAccessibleForFree":true,
+      "creativeWorkStatus":f.state||'未声明时效',
+      "disclaimer":[].concat(b.not_for||[]).concat(b.requires_human||[]).join(' ')
+        || undefined
+    };
+  });
+  host.textContent=JSON.stringify({"@context":"https://schema.org","@graph":graph});
+}
+
+/* 标签筛选栏：只列出现过的标签，按出现次数排序取前 N 个 */
+function buildTagbar(list){
+  const cnt={};
+  list.forEach(x=>(x.tags||[]).forEach(t=>cnt[t]=(cnt[t]||0)+1));
+  const top=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]).slice(0,18);
+  const bar=document.getElementById('tagbar');
+  bar.innerHTML=top.map(t=>`<span class="tg" data-t="${t}">${t}</span>`).join('');
+  bar.querySelectorAll('.tg').forEach(el=>{
+    el.onclick=()=>{
+      const t=el.dataset.t;
+      if(ACTIVE.has(t)){ACTIVE.delete(t);el.classList.remove('on');}
+      else{ACTIVE.add(t);el.classList.add('on');}
+      render();
+    };
+  });
+}
+
+/* 一条记录的全部可搜索文本 */
+function hay(x){
+  return [x.title,x.summary,(x.tags||[]).join(' '),(x.entities||[]).join(' '),
+    (x.sections||[]).map(s=>[s.title,s.gist,(s.terms||[]).join(' ')].join(' ')).join(' '),
+    (x.boundaries?Object.values(x.boundaries).flat().join(' '):'')
+  ].join(' ').toLowerCase();
+}
+
+const KIND={
+  knowledge:{cls:'b-pub',  label:'K_pub · 料', note:''},
+  trace:    {cls:'b-trace',label:'K_pub · 迹', note:'迹 —— 可验证的行为记录，不是成果展示'},
+  goods:    {cls:'b-goods',label:'K_pub · 货', note:'货 —— 要换的交付物。价签可见，内容不外露'}
+};
+const FRESH={
+  '有效':{cls:'f-ok',  txt:''},
+  '长期':{cls:'f-ok',  txt:'长期有效'},
+  '临期':{cls:'f-warn',txt:'临近时效，应安排复核'},
+  '已过期':{cls:'f-exp', txt:'⚠ 时效已过，不可直接引用'},
+  '未声明':{cls:'f-none',txt:'未声明时效'}
+};
+
+function render(){
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  const grid=document.getElementById('pubgrid');
+  const hits=ALL.filter(x=>{
+    if(ACTIVE.size && ![...ACTIVE].every(t=>(x.tags||[]).includes(t))) return false;
+    if(q && !hay(x).includes(q)) return false;
+    return true;
+  });
+  document.getElementById('hits').textContent =
+    (q||ACTIVE.size) ? `${hits.length} / ${ALL.length} 条` : `共 ${ALL.length} 条`;
+  document.getElementById('empty').style.display = hits.length ? 'none' : 'block';
+  grid.innerHTML='';
+  hits.forEach(x=>grid.appendChild(card(x)));
+}
+
+function card(x){
+  const el=document.createElement('div');
+  const nsec=(x.sections||[]).length;
+  el.className='kcard'+(nsec>2?' wide':'');
+  const k=KIND[x.kind]||KIND.knowledge;
+  let secs='';
+  if(nsec){
+    const items=x.sections.map(s=>`<div class="sec"><b>§${s.anchor} ${s.title}</b><p>${s.gist}</p>`+
+        (s.terms&&s.terms.length?`<div class="secterms">${s.terms.map(t=>`<span>${t}</span>`).join('')}</div>`:'')+
+        `</div>`).join('');
+    secs=`<details class="sects"><summary>分章切片（${nsec} 段，可展开）</summary>`+
+      (nsec>2?`<div class="secgrid">${items}</div>`:items)+`</details>`;
+  }
+  // 时效：AI 引用过期信息比不知道更糟，所以这一栏必须一眼看到
+  const fr=FRESH[(x._fresh&&x._fresh.state)||'未声明']||FRESH['未声明'];
+  const fresh=`<div class="fresh ${fr.cls}">${x._fresh&&x._fresh.valid_until
+      ? '时效至 '+x._fresh.valid_until : ''}${(x._fresh&&x._fresh.days_left<0)
+      ? '（已过 '+Math.abs(x._fresh.days_left)+' 天）' : ''}
+      ${x.review_cadence?' · 复核：'+x.review_cadence : ''}${fr.txt?' · '+fr.txt:''}</div>`;
+
+  // 边界：只讲优点的资产等于广告，AI 不敢推荐
+  let bnd='';
+  if(x.boundaries){
+    const B=x.boundaries;
+    const blk=(t,arr,cls)=>arr&&arr.length
+      ? `<div class="bnd ${cls}"><b>${t}</b><ul>${arr.map(i=>`<li>${i}</li>`).join('')}</ul></div>` : '';
+    const inner = blk('不适用于 / 不推荐', B.not_for,'bn-for')
+               + blk('已知薄弱环节', B.weak_at,'bn-weak')
+               + blk('必须由人拍板', B.requires_human,'bn-human')
+               + blk('如何自行验证', B.verify,'bn-verify');
+    if(inner) bnd=`<details class="bnds"><summary>边界与可证伪性（${['not_for','weak_at','requires_human','verify']
+        .filter(k=>B[k]&&B[k].length).length} 栏，可展开）</summary>${inner}</details>`;
+  }
+
+  // 高危内容：不折叠，直接顶在摘要下方。
+  // 为什么：健康/金融/法律这类内容，藏在折叠区等于没写 ——
+  // 人只看到「有边界」两个字，但看不到边界是什么。
+  // 判断依据：not_for 命中「不可」「医疗」「自行」等硬约束关键词。
+  const HARD=/不可|医疗|有创|自行|禁止|诊断|用药|手术|法律|投资/;
+  const hardHit=(x.boundaries&&x.boundaries.not_for||[]).find(s=>HARD.test(s));
+  const alarm=hardHit?`<div class="alarm"><b>⚠ 高危内容 · 不可直接照做</b><p>${hardHit}</p>
+    <p class="more">完整边界（共 ${(x.boundaries.not_for||[]).length} 条不适用 + ${(x.boundaries.weak_at||[]).length} 条薄弱环节）在下方展开区</p></div>`:'';
+
+  el.innerHTML=`
+    <div class="ttl"><span class="caret">▶</span>
+      <div style="flex:1">
+        <span class="badge ${k.cls}">${k.label}</span>
+        <h3>${x.title}</h3>
+        ${k.note?`<div class="kindnote">${k.note}</div>`:''}
+        ${fresh}
+      </div>
+    </div>
+    <div class="tgline">${(x.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="body">
+      <div class="id">${x.id}</div>
+      <p>${x.summary}</p>
+      ${alarm}
+      <div class="ents">实体：${(x.entities||[]).join(' · ')}</div>
+      ${bnd}
+      ${secs}
+    </div>`;
+  el.querySelector('.ttl').onclick=()=>el.classList.toggle('open');
+  return el;
+}
+
+function renderPri(pri){
+  const pg=document.getElementById('prigrid');
+  if(!pri.length){
+    pg.innerHTML='<div class="empty">货架暂空 —— K_pri 是「要换」的资产，等你决定哪些挂牌。</div>';
+    return;
+  }
+  let t='<table class="pricetable"><tr><th>资产</th><th>是什么</th><th>可交付</th><th>怎么换</th></tr>';
+  pri.forEach(x=>{const p=x.price||{};t+=`<tr><td><b>${x.title}</b></td><td>${p.what||''}</td><td>${p.deliver||''}</td><td>${p.how||''}</td></tr>`;});
+  t+='</table>'; pg.innerHTML=t;
+}
+
+document.getElementById('q').addEventListener('input', render);
+</script>
+</body>
+</html>
