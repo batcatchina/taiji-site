@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MRS-EV 太极·点圆统一模型 · 一键上手</title>
+<meta name="description" content="MRS-EV 太极·点圆统一上下文资产模型：内核 M(身份/原则/边界) + 协议 R + 状态 S + 外延 E + 资产层 K。AI 时代的上下文入口。">
+<link rel="canonical" href="https://taiji.zheng-he.top/">
+<link rel="alternate" type="text/plain" href="/llms.txt">
+
+<!-- Schema.org：站点主入口。2026-10-06 核实 —— llms.txt 虽被 AI 编程工具读取，
+     但主流 AI 搜索爬虫基本绕过它直接抓 HTML，Google 明确不支持。
+     因此本标记是发现层的关键路径，字段与 Memory.md / VERSION.json 保持一致。 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://taiji.zheng-he.top/#website",
+  "name": "MRS-EV 太极·点圆统一上下文资产模型",
+  "alternateName": "MRS-EV",
+  "url": "https://taiji.zheng-he.top/",
+  "inLanguage": "zh-CN",
+  "description": "太极是展开，点圆是收敛。Context = ●(M|R|S) + ○(E1|E2|E3_ref) + K(K_pub|K_pri)。内核不轻动、协议先行、状态必更新、外延可插拔、虚实分离、真值入 Vault、最小权限、泄露即轮换。",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://taiji.zheng-he.top/deck/k.html",
+    "query-input": "required name=search_string"
+  }
+}
+</script>
+<style>
+:root{--bg:#0b1020;--bg2:#111a33;--card:#16203c;--tx:#e8eefc;--mut:#9db0d4;
+--acc:#22d3ee;--acc2:#a78bfa;--line:rgba(255,255,255,.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1100px 700px at 15% -10%,#1a2450 0%,var(--bg) 55%) fixed;
+color:var(--tx);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+line-height:1.7;-webkit-text-size-adjust:100%}
+.wrap{max-width:900px;margin:0 auto;padding:44px 22px 70px}
+.kicker{font-size:12px;letter-spacing:.2em;color:var(--acc);font-weight:700;margin-bottom:12px}
+h1{font-size:clamp(28px,5.4vw,46px);font-weight:800;line-height:1.2}
+h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;margin:44px 0 6px}
+.grad{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mut);font-size:clamp(14px,2vw,17px);margin-top:14px;max-width:660px}
+.heroquote{margin-top:22px;padding:16px 20px;border-left:3px solid var(--acc);border-radius:0 12px 12px 0;
+background:rgba(34,211,238,.09);font-size:clamp(14px,2vw,17px)}
+.heroquote b{color:var(--acc)}
+
+.tjbox{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:26px;
+background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+border-radius:16px;padding:18px 20px}
+.tj{width:200px;height:auto;flex:0 0 200px}
+.tjtext{flex:1;min-width:220px;font-size:13.5px;color:var(--mut)}
+.tjtext b{color:var(--tx)}
+.tjtext div{margin-bottom:5px}
+
+.dl{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.dlcard{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+border-radius:14px;padding:20px;text-align:center}
+.dlcard.primary{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.dlcard h3{font-size:16px;margin-bottom:6px}
+.dlcard p{font-size:12.5px;color:var(--mut);margin-bottom:14px;min-height:34px}
+.btn{display:inline-block;padding:11px 22px;border-radius:11px;font-weight:800;font-size:14px;
+text-decoration:none;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#06121f}
+.btn.ghost{background:transparent;border:1px solid var(--acc);color:var(--acc)}
+.met{font-size:11.5px;color:var(--mut);margin-top:9px}
+
+ol{margin:18px 0 0 20px}
+ol li{margin-bottom:12px;font-size:14.5px;color:var(--mut)}
+ol li b{color:var(--tx)}
+.card{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+border-radius:14px;padding:18px 20px;margin-top:16px}
+pre{background:#080d1c;border:1px solid var(--line);border-radius:11px;padding:14px 16px;
+overflow-x:auto;font-size:13px;color:var(--mut);margin-top:12px;position:relative}
+pre b{color:var(--acc);font-weight:600}
+.cp{position:absolute;top:8px;right:8px;font-size:11px;padding:4px 9px;border-radius:7px;
+border:1px solid var(--line);background:rgba(22,32,60,.9);color:var(--mut);cursor:pointer}
+.cp:active{color:var(--acc);border-color:var(--acc)}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--acc);font-size:12px}
+td{color:var(--mut)} td b{color:var(--tx)}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.lg{font-size:12px;padding:5px 11px;border-radius:8px;background:rgba(255,255,255,.05);
+border:1px solid var(--line);color:var(--mut)} .lg b{color:var(--tx)}
+.foot{margin-top:46px;padding-top:20px;border-top:1px solid var(--line);
+font-size:12.5px;color:var(--mut);text-align:center}
+@media(max-width:700px){
+  .wrap{padding:28px 16px 54px}
+  table{display:block;overflow-x:auto;white-space:nowrap}
+  .dl{grid-template-columns:1fr}
+  .tj{width:150px;flex-basis:150px;margin:0 auto}
+  .tjbox{gap:14px}
+}
+.topnav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:26px}
+.topnav a{font-size:13.5px;font-weight:600;padding:8px 15px;border-radius:10px;border:1px solid var(--line);
+background:var(--card);color:var(--mut);transition:.15s}
+.topnav a:hover{color:var(--tx);border-color:var(--acc)}
+.topnav a.here{background:linear-gradient(160deg,var(--acc),var(--acc2));color:#06121f;border-color:transparent}
+.topnav .brand{margin-right:auto;font-weight:800;color:var(--tx);letter-spacing:.3px}
+.topnav .brand span{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="topnav">
+    <span class="brand">太极 · <span>MRS-EV</span></span>
+    <a href="/" class="here">首页</a>
+    <a href="/assets.html">资产目录</a>
+    <a href="/deck/">课件</a>
+    <a href="/llms.txt">llms.txt</a>
+  </nav>
+
+  <div class="kicker">MRS-EV · Taiji-PointCircle Unified Context Asset Model</div>
+  <h1>把上下文变成<span class="grad">可迁移资产</span><br>把秘密留在金库</h1>
+  <div class="lead">一套不绑定任何平台的上下文组织模型。三个文件定内核，一张引用表管凭证，真值永远在你自己手里。</div>
+  <div class="heroquote">它<b>不把密码写进上下文</b>，而是把上下文变成可迁移资产；把秘密留在金库，把引用写进体系。</div>
+
+  <div class="tjbox">
+    <svg viewBox="0 0 330 300" class="tj" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="y" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#cbddff"/></linearGradient></defs>
+      <circle cx="140" cy="150" r="110" fill="url(#y)"/>
+      <path d="M140,40 A110,110 0 0,0 140,260 A55,55 0 0,1 140,150 A55,55 0 0,0 140,40 Z" fill="#141d3d"/>
+      <path d="M140,260 A55,55 0 0,1 140,150 A55,55 0 0,0 140,40" fill="none" stroke="#22d3ee" stroke-width="3.5"/>
+      <circle cx="140" cy="150" r="14" fill="#22d3ee"/>
+      <text x="140" y="155" text-anchor="middle" font-size="12" font-weight="800" fill="#06121f">R</text>
+      <circle cx="140" cy="150" r="110" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.4"/>
+      <circle cx="140" cy="95" r="21" fill="#eef4ff"/>
+      <text x="140" y="100" text-anchor="middle" font-size="13" font-weight="800" fill="#141d3d">S</text>
+      <circle cx="140" cy="205" r="21" fill="#141d3d"/>
+      <text x="140" y="210" text-anchor="middle" font-size="12" font-weight="800" fill="#eef4ff">E3</text>
+      <text x="80" y="100" text-anchor="middle" font-size="16" font-weight="800" fill="#8095cf">M</text>
+      <text x="108" y="192" text-anchor="middle" font-size="15" font-weight="800" fill="#4a5e8e">E1</text>
+      <text x="172" y="192" text-anchor="middle" font-size="15" font-weight="800" fill="#4a5e8e">E2</text>
+      <line x1="161" y1="205" x2="256" y2="205" stroke="#a78bfa" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <rect x="256" y="187" width="66" height="36" rx="9" fill="rgba(167,139,250,.16)" stroke="#a78bfa" stroke-width="1.2"/>
+      <text x="289" y="210" text-anchor="middle" font-size="13" font-weight="700" fill="#c4b5fd">Vault</text>
+    </svg>
+    <div class="tjtext">
+      <div><b>阴鱼 = 内核</b>：鱼身 M ＋ S曲线 R ＋ 鱼眼 S</div>
+      <div><b>阳鱼 = 外延</b>：鱼身 E1/E2 ＋ 鱼眼 E3</div>
+      <div><b>Vault</b> 隐于圆外，真值不画，只留引线</div>
+      <div style="margin-top:8px;color:var(--acc2)">阴中阳点 S（内核中唯一的"动"）· 阳中阴点 E3（外延中唯一的"实"）</div>
+    </div>
+  </div>
+
+  <h2>① 下载</h2>
+  <div class="dl">
+    <div class="dlcard primary">
+      <h3>🌀 空白骨架 ZIP</h3>
+      <p>11 个文件（含交接包生成器 + 蒸馏器），解压进项目根目录即可开工。浏览器本地打包，不经服务器。</p>
+      <button class="btn" onclick="makeZip(this)">下载 mrs-ev-template.zip</button>
+      <div class="met">约 27 KB · 11 个文件</div>
+    </div>
+    <div class="dlcard">
+      <h3>📖 在线查看 / 复制</h3>
+      <p>不想下载？直接展开看每个文件内容，逐条复制。</p>
+      <button class="btn ghost" onclick="toggleFiles(this)">展开文件清单</button>
+      <div class="met">纯文本 Markdown，任何编辑器可开</div>
+    </div>
+  </div>
+  <div id="fileList" style="display:none;margin-top:16px"></div>
+
+  <h2>② 三步上手</h2>
+  <ol>
+    <li><b>解压到你的项目根目录。</b>得到 11 个文件 + <code>secrets/</code>。</li>
+    <li><b>按 TODO 填，顺序别反：</b>先 <code>Memory.md</code>（我是谁/为何做/不做什么）→ 再 <code>Readme.md</code>（怎么协作）→ 最后 <code>State.md</code>（现在在哪）。<b>内核先立，外延后挂。</b></li>
+    <li><b>真值一律不写进这些文件。</b>密钥存 Vault，体系里只留引用名（写在 Readme 的凭证引用表）。</li>
+  </ol>
+
+  <div class="card">
+    <b>命令行用户：</b>
+    <pre id="c1"><b># 复制骨架到新项目</b>
+cp -r mrs-ev-template/. ../my-new-project/
+
+<b># 查看所有待填项</b>
+grep -r "TODO" ../my-new-project/<button class="cp" onclick="cp('c1',this)">复制</button></pre>
+  </div>
+
+  <h2>③ 文件都是干什么的</h2>
+  <table>
+    <tr><th>文件</th><th>回答什么</th><th>改的频率</th></tr>
+    <tr><td><b>Memory.md</b> ●</td><td>我是谁？为何做？不做什么？</td><td>最低</td></tr>
+    <tr><td><b>Readme.md</b> ●</td><td>怎么读？怎么写？凭证引用表</td><td>中</td></tr>
+    <tr><td><b>State.md</b> ●</td><td>现在在哪？卡在哪？下一步？</td><td>最高</td></tr>
+    <tr><td><b>TOOLS.md</b> / <b>repos.md</b> ○</td><td>有什么工具、仓库？</td><td>动态</td></tr>
+    <tr><td><b>.env.example</b> ○</td><td>有什么非密配置（只写键名）</td><td>中</td></tr>
+    <tr><td><b>secrets/README.md</b> ○</td><td>需要哪个凭证（只写"如何取"）</td><td>按需</td></tr>
+    <tr><td><b>.gitignore</b></td><td>已预置：忽略 .env 与 secrets/*</td><td>—</td></tr>
+    <tr><td><b>scripts/handoff.py</b></td><td>一键生成交接包，交给别的 Agent</td><td>交接时</td></tr>
+    <tr><td><b>Journal.md</b></td><td>经验流水，只追加不改写</td><td>每次任务</td></tr>
+    <tr><td><b>scripts/distill.py</b></td><td>把流水提炼成内核候选原则</td><td>攒一批后</td></tr>
+  </table>
+  <div class="legend">
+    <span class="lg"><b>● 点</b> = 内核，自己管</span>
+    <span class="lg"><b>○ 圆</b> = 外延，可托管</span>
+    <span class="lg"><b>Vault</b> = 真值，体系外</span>
+  </div>
+
+
+  <h2>④ 交给另一个 Agent</h2>
+  <div class="card" style="border-color:var(--acc)">
+    <b>交接不是传文件，是传「最小可重建集」。</b>
+    <div style="color:var(--mut);font-size:14px;margin-top:8px;line-height:1.75">
+      文件传过去，对方拿到的是数据不是理解 —— 它不知道读哪个、哪些是硬约束、哪个已经过期。
+      按「能否重建」切一刀，边界不用人划，模型自己就推出来了。
+    </div>
+  </div>
+  <table>
+    <tr><th>层</th><th>能否重建</th><th>交接策略</th></tr>
+    <tr><td><b>内核 ●</b></td><td>不可重建</td><td><b>原样搬运</b></td></tr>
+    <tr><td><b>外延 ○</b></td><td>可重建</td><td>只给索引</td></tr>
+    <tr><td><b>真值</b></td><td>—</td><td><b>永不交接</b>，只给引用名</td></tr>
+  </table>
+  <div class="legend">
+    <span class="lg"><b>挂载</b> 同机换 Agent → 一层薄指针</span>
+    <span class="lg"><b>快照</b> 跨人跨机 → HANDOFF.md 单文件</span>
+    <span class="lg"><b>共治</b> 多 Agent 同时 → 内核只读 ＋ 状态分片</span>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <b>两条硬规矩：</b>
+    <div style="color:var(--mut);font-size:13.5px;margin-top:6px;line-height:1.8">
+      ① 交接包必须<b style="color:var(--tx)">生成</b>，不能手写 —— 手写的必过期；而过期的交接包比没有更危险，它让接手方<b style="color:var(--tx)">以为自己懂了</b>。<br>
+      ② 交接必须<b style="color:var(--tx)">自带验收</b> —— 接手方要能回答四问（是什么／卡在哪／下一步／不能碰什么），答不上就回问，不许猜。
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <b style="color:var(--acc)">一条命令：</b>
+    <pre id="c2" style="margin-top:8px">python3 scripts/handoff.py .      <span style="color:var(--mut)"># 生成 HANDOFF.md，并做交接前自检</span><button class="cp" onclick="cp('c2',this)">复制</button></pre>
+    <div style="color:var(--mut);font-size:13px;margin-top:8px">
+      自检会拦下：内核缺文件、遗留 TODO、阻塞为空 —— 这几样任缺其一，交接就是假的。
+    </div>
+  </div>
+
+
+  <h2>⑤ 让经验沉淀回内核</h2>
+  <div class="card" style="border-color:var(--acc2)">
+    <b>不沉淀的教训，会变成反复踩的坑。</b>
+    <div style="color:var(--mut);font-size:14px;margin-top:8px;line-height:1.75">
+      一次任务学到的东西，要么留在 State 里等着被覆盖，要么靠人手动搬进 Memory —— 多数是前者。
+      所以模型留了第三个内核态 <b style="color:var(--tx)">J（日志）</b>：任务结束追加一条，攒一批后蒸馏成原则。
+    </div>
+  </div>
+  <div class="legend">
+    <span class="lg"><b>M</b> 记忆 · 我是谁</span>
+    <span class="lg"><b>S</b> 状态 · 我在哪</span>
+    <span class="lg"><b>J</b> 日志 · 我摔过哪</span>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <b style="color:var(--acc)">M 指导 S　→　S 产生 J　→　J 蒸馏回 M</b>
+    <div style="color:var(--mut);font-size:13.5px;margin-top:6px;line-height:1.7">
+      前两个是<b style="color:var(--tx)">呼吸</b>（内核 ↔ 外延 ↔ Vault 的横向流通），第三个是<b style="color:var(--tx)">生长</b>。
+      补上它，太极才<b style="color:var(--tx)">自转</b>起来。<br>
+      J 是「半内核」—— 不可重建，但<b style="color:var(--tx)">不参与日常决策</b>，Agent 平时不读它，只在蒸馏时才翻出来。
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <b>速判：</b>换一个全新的项目，这条还成立吗？成立才进 M。
+    <div style="color:var(--mut);font-size:13px;margin-top:6px">
+      一次是意外，两次是模式，三次是原则 —— <b style="color:var(--tx)">频次是天然的去噪器</b>。
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px;border-color:var(--acc2)">
+    <b style="color:var(--acc2)">人工闸门：</b>脚本只提候选，<b style="color:var(--tx)">绝不自动改内核</b>。
+    <div style="color:var(--mut);font-size:13px;margin-top:6px">
+      <code>Journal → CANDIDATES →（人勾选）→ Memory</code>　——　<b style="color:var(--tx)">相可以自动，君不可以。</b>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <b style="color:var(--acc)">两条命令：</b>
+    <pre id="c3" style="margin-top:8px">python3 scripts/distill.py          <span style="color:var(--mut)"># 流水 → 候选提案</span>
+python3 scripts/distill.py --apply  <span style="color:var(--mut)"># 勾选的 → 落入内核</span><button class="cp" onclick="cp('c3',this)">复制</button></pre>
+  </div>
+
+  <h2>八原则</h2>
+  <div class="legend">
+    <span class="lg">1 内核不轻动</span><span class="lg">2 协议先行</span>
+    <span class="lg">3 状态必更新</span><span class="lg">4 外延可插拔</span>
+    <span class="lg">5 虚实分离</span><span class="lg">6 真值入 Vault</span>
+    <span class="lg">7 最小权限</span><span class="lg">8 泄露即轮换</span>
+  </div>
+
+  <div class="card" style="margin-top:26px">
+    <b>一句话记住它：</b>点不动，圆可扩；点实，圆虚；虚实结合，安全可迁移。
+  </div>
+
+  <div class="card" style="margin-top:14px;border-color:var(--acc2)">
+    <b style="color:var(--acc2)">📽 配套课件</b>
+    <div style="color:var(--mut);font-size:13.5px;margin-top:6px">
+      《从会用 AI 到会造 Agent》16 页讲稿 —— 用本模型组织的一门课，第 14–15 页即模型图解。<br>
+    课件项目另附 <code>examples/minimal_agent.py</code>：<b style="color:var(--tx)">没有 API Key 也能跑</b>，
+    内置 MockLLM 完整演示「思考 → 调工具 → 观察 → 回答」的循环。
+    </div>
+    <div style="margin-top:12px"><a class="btn ghost" href="deck/">打开课件 →</a></div>
+  </div>
+
+  <div class="foot">MRS-EV 太极·点圆统一模型 · v1.0<br>
+  不绑定任何平台 —— 换 Agent、换平台，这套结构不变，上下文资产始终在你手里。</div>
+</div>
+
+<script>
+function cp(id,btn){
+  const t=document.getElementById(id).innerText.replace('复制','').trim();
+  navigator.clipboard.writeText(t).then(()=>{btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1600)});
+}
+</script>
+
+<script>
+const MRSEV_FILES = [{"name": ".env.example", "text": "# ○ .env.example —— 配置外延 E2（只写键名模板，不写值）\n# 真实 .env 必须被 .gitignore 忽略；真值一律存 Vault（见 Readme 凭证引用表）\n\n# 示例：引用名形式，运行期由 Vault 注入\n# API_TOKEN=<<E3_API_TOKEN>>\n\n# 非密配置可直接写默认值\nLOG_LEVEL=info\nOUTPUT_DIR=./out\n"}, {"name": ".gitignore", "text": "# ⚠️ 建外延之前先上锁：忽略实际非密配置与机密目录\n.env\n*.env.local\nsecrets/*\n!secrets/README.md\n*.key\n*.pem\n*.p12\n\n# 常规忽略\n__pycache__/\n*.pyc\nnode_modules/\n.DS_Store\n"}, {"name": "Memory.md", "text": "# ● Memory.md —— 自主内核（太极阴鱼 / 实点）\n\n> **新建项目第一步：先立「地之极」。** 只写长期有效内容，内核不轻动。\n> 回答四问：我是谁？为何做？原则？边界？\n\n## 一、身份（我是谁）\n<!-- TODO: 用一句话写清角色定位。例：一个面向 X 场景的 Y 系统 / 助手。 -->\n\n## 二、目标（为何做）\n<!-- TODO: 写 1-3 条核心目标，长期有效。 -->\n\n## 三、原则（长期有效）\n<!-- TODO: 写 4-6 条不可轻易更改的原则（安全、质量、协作等）。 -->\n\n## 四、边界（不做什么）\n<!-- TODO: 写清红线与禁区（不替代什么、不处理什么、不泄露什么）。 -->\n\n## 五、核心约定（点内三性）\n\n| 符号 | 文件 | 本体内涵 |\n|------|------|----------|\n| M | Memory.md | 身份、目标、原则、边界（阴鱼主体） |\n| R | Readme.md | 读取/写入协议、凭证引用表（S 曲线协议） |\n| S | State.md  | 当前目标、进度、阻塞、下一步（阴中阳点） |\n"}, {"name": "Readme.md", "text": "# ● Readme.md —— 协议（S 曲线 / 点内三性之一）\n\n> **协议先行：必须先读。** 回答「怎么读？怎么写？怎么协作？」\n\n## 一、读取顺序（启动闭环）\n```\nReadme → Memory → State →（按需）E1 / E2 / E3_ref\n```\n\n## 二、写入规则（更新闭环）\n| 什么变了 | 写到哪 |\n|----------|--------|\n| 任务 / 进度 | State.md |\n| 规则 / 协作约定 | Readme.md |\n| 身份 / 原则 / 边界 | Memory.md |\n| 机密 / 凭证 | Vault（只改引用名） |\n\n## 三、凭证引用表（E3_ref —— 只引用，不写值）\n<!-- TODO: 登记「引用名 → Vault 路径」，绝不在本文件写任何真值。 -->\n\n| 引用名 | 用途 | Vault 路径（如何取） |\n|--------|------|---------------------|\n| `E3_EXAMPLE_KEY` | 示例 | `project-name/example_key` |\n\n## 四、八原则\n1. 内核不轻动　2. 协议先行　3. 状态必更新　4. 外延可插拔\n5. 虚实分离　6. 真值入 Vault　7. 最小权限　8. 泄露即轮换\n"}, {"name": "State.md", "text": "# ● State.md —— 状态（阴中阳点 / 点内三性之一）\n\n> 连接态：回答「现在在哪？卡在哪？下一步？」**状态必更新。**\n\n## 当前目标\n<!-- TODO: 当前阶段要达成什么？ -->\n\n## 进度\n<!-- TODO: 用 - [x] / - [ ] 列出已完成与待办。 -->\n\n## 阻塞\n<!-- TODO: 卡在哪？没有就写「暂无」。本项不可留空。 -->\n\n## 下一步\n<!-- TODO: 紧接着要做的 1-3 个动作。本项不可留空。 -->\n\n## 运行位置提示\n- 启动顺序：`Readme → Memory → State`。\n- 真值（E3）按需从 Vault 注入（见 Readme 凭证引用表）。\n"}, {"name": "TOOLS.md", "text": "# ○ TOOLS.md —— 公开外延 E1（阳鱼主体 / 圆内环）\n\n> 可直接读。有什么工具、命令、路径？\n\n## 一、运行环境\n<!-- TODO: OS、语言版本、关键依赖。 -->\n\n## 二、常用命令\n<!-- TODO: 表格形式列出用途 → 命令。 -->\n\n## 三、路径约定\n<!-- TODO: 交付目录 / 上传目录 / 共享目录。 -->\n\n## 四、外部依赖与知识来源\n<!-- TODO: 需要联网引用的外部资源。注：所需密钥见 Readme 凭证引用表（E3_ref），不在此写值。 -->\n"}, {"name": "repos.md", "text": "# ○ repos.md —— 公开外延 E1（仓库清单）\n\n> 可直接读。有哪些仓库？用途？远程地址？\n\n## 一、本项目仓库\n| 仓库名 | 用途 | 远程地址 |\n|--------|------|----------|\n<!-- TODO: 填写仓库。 -->\n\n## 二、外部参考资源（非代码仓库）\n<!-- TODO: 需要引用的外部站点 / 标准 / 数据源。 -->\n\n## 三、添加新仓库的约定\n- 公开仓库：直接在此追加（E1）。\n- 含机密配置的：配置写 `.env.example`（E2），真值走 Vault（E3）。\n- 变更后回填 State.md 的「进度」。\n"}, {"name": "secrets/README.md", "text": "# ○ secrets/README.md —— 机密外延 E3_ref（阳中阴点 / 圆内环）\n\n> **只写「如何取」，不写值。** 真值在 Vault，体系只留引用名。\n\n## 一、原则\n- 本目录不放任何明文密钥、密码、PAT、API Key。\n- 所有机密以「引用名」出现在代码与文档中（见 Readme 凭证引用表）。\n- 运行期由 Vault 注入环境变量，使用后即弃，不落盘。\n\n## 二、如何取（取用流程）\n```\n引用名 → Vault 路径 → 取出 → 注入环境 → 运行期使用 → 不写文件\n```\n\n## 三、Vault 选型（独立于项目之外）\n| 场景 | 推荐 |\n|------|------|\n| 个人 | 系统钥匙串 / 1Password / Bitwarden / KeePassXC |\n| 团队 | HashiCorp Vault / Infisical / Doppler / 云 Secrets Manager |\n| 高安全 | HSM / YubiHSM / Thales Luna / Azure Managed HSM |\n\n## 四、本项目引用清单\n<!-- TODO: 与 Readme 凭证引用表保持一致。 -->\n\n| 引用名 | Vault 路径 |\n|--------|-----------|\n| `E3_EXAMPLE_KEY` | `project-name/example_key` |\n\n## 五、泄露处置\n- 泄露即轮换：在 Vault 中吊销并重签，更新引用映射。\n- 不依赖「删除 git 历史」止血，靠换凭证。\n- 最小权限：短期令牌、按需授权、可轮换。\n"}, {"name": "scripts/handoff.py", "text": "#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n\"\"\"\nhandoff.py —— 生成 HANDOFF.md 单文件交接包\n\n用法:\n    python3 scripts/handoff.py                    # 当前目录\n    python3 scripts/handoff.py ../my-proj         # 指定项目\n    python3 scripts/handoff.py . -o /tmp/H.md     # 指定输出\n    python3 scripts/handoff.py . --stdout         # 打到标准输出（方便直接粘贴）\n\n它只做一件事: 把「丢了就重建不出来」的那部分挑出来，压成一个可粘贴的文件。\n内核原样搬，外延只给索引，真值只给名字。\n\"\"\"\n\nimport argparse\nimport datetime\nimport os\nimport re\nimport sys\n\nKERNEL = [(\"Memory.md\", \"M\", \"我是谁\"), (\"Readme.md\", \"R\", \"怎么协作\"), (\"State.md\", \"S\", \"现在在哪\")]\n\nWARN = []\nOK = []\n\n\ndef read(p):\n    try:\n        with open(p, encoding=\"utf-8\") as f:\n            return f.read()\n    except FileNotFoundError:\n        return None\n\n\ndef say(tag, msg):\n    print(f\"  [{tag}] {msg}\", file=sys.stderr)\n\n\ndef section(text, title):\n    \"\"\"抽取 markdown 中某个 ## 标题下的内容。\n\n    注意：标题匹配必须限定在同一行内（用 [^\\\\n] 而非 .），\n    否则正文里出现过该词时会抢先匹配到错的标题，抽到空串。\n    \"\"\"\n    if not text:\n        return \"\"\n    m = re.search(r\"^#{1,3}\\s*[^\\n]*?\" + re.escape(title) + r\"[^\\n]*$\\n(.*?)(?=^#{1,3}\\s|\\Z)\",\n                  text, re.M | re.S)\n    return m.group(1).strip() if m else \"\"\n\n\ndef is_empty(body):\n    \"\"\"判断一段内容是否「实质性为空」。\n\n    只写「暂无 / 无 / N/A」等于没写；写了「暂无外部阻塞，但 X 待办」则算有内容。\n    \"\"\"\n    if not body:\n        return True\n    if re.search(r\"<!--\\s*TODO\", body):\n        return True\n    stripped = re.sub(r\"[暂无没有N/A\\-—*·。、，\\s]+\", \"\", body)\n    return len(stripped) < 4\n\n\ndef env_keys(text):\n    \"\"\"从 .env.example 提取键名（只要键，绝不要值）\"\"\"\n    if not text:\n        return []\n    keys = []\n    for line in text.splitlines():\n        s = line.strip()\n        if not s or s.startswith(\"#\"):\n            continue\n        if \"=\" in s:\n            keys.append(s.split(\"=\", 1)[0].strip())\n    return keys\n\n\n# 占位符名字：出现在模板/示例里，不是真凭证\nPLACEHOLDER = re.compile(r\"(XXX|EXAMPLE|SAMPLE|DEMO|PLACEHOLDER|YOUR|_TEMPLATE|TODO)\", re.I)\n# 模板与文档目录不算项目的真凭证来源\nSKIP_DIRS = (\".git\", \"node_modules\", \"secrets\", \".venv\", \"template\", \"docs\", \"examples\", \"adapters\")\n\n\ndef e3_names(root):\n    \"\"\"全项目扫 E3_* 引用名 —— 只取名字，不取值\"\"\"\n    names = set()\n    pat = re.compile(r\"\\b(E3_[A-Z0-9_]+)\\b\")\n    for dirpath, dirnames, filenames in os.walk(root):\n        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]\n        for fn in filenames:\n            if not fn.endswith((\".md\", \".example\", \".yml\", \".yaml\", \".json\", \".sh\", \".py\")):\n                continue\n            try:\n                with open(os.path.join(dirpath, fn), encoding=\"utf-8\", errors=\"ignore\") as f:\n                    for m in pat.finditer(f.read()):\n                        n = m.group(1)\n                        if not PLACEHOLDER.search(n):\n                            names.add(n)\n            except OSError:\n                pass\n    return sorted(names)\n\n\ndef strip_code(text):\n    \"\"\"去掉围栏代码块 —— 示例里的 <!-- TODO --> 是文档内容，不是真的待填项\"\"\"\n    return re.sub(r\"```.*?```\", \"\", text or \"\", flags=re.S)\n\n\ndef leftover_todos(root):\n    \"\"\"扫出还没填的 TODO —— 内核没填完就交接，等于把坑交给别人\"\"\"\n    hits = []\n    for fn in (\"Memory.md\", \"Readme.md\", \"State.md\"):\n        t = strip_code(read(os.path.join(root, fn)))\n        if not t:\n            continue\n        n = len(re.findall(r\"<!--\\s*TODO\", t))\n        if n:\n            hits.append((fn, n))\n    return hits\n\n\ndef fence(body, fallback):\n    body = (body or \"\").strip()\n    return body if body else fallback\n\n\ndef build(root, author):\n    m = read(os.path.join(root, \"Memory.md\"))\n    r = read(os.path.join(root, \"Readme.md\"))\n    s = read(os.path.join(root, \"State.md\"))\n\n    # --- 内核完整性检查 ---\n    missing = [fn for fn, _, _ in KERNEL if read(os.path.join(root, fn)) is None]\n\n    # --- 阻塞检查：State.md 没写阻塞 = 交接无效 ---\n    blk = section(s, \"阻塞\")\n    nxt = section(s, \"下一步\")\n    if s is not None:\n        if is_empty(blk):\n            WARN.append(\"State.md 的「阻塞」实质为空 —— 这是最不可重建的信息，建议先填\")\n        else:\n            OK.append(\"State.md 有明确的阻塞记录\")\n        if is_empty(nxt):\n            WARN.append(\"State.md 的「下一步」实质为空 —— 接手方不知道第一步干什么\")\n        else:\n            OK.append(\"State.md 有明确的下一步\")\n        if re.search(r\"<!--\\s*TODO\", strip_code(s)):\n            WARN.append(\"State.md 仍有未填 TODO\")\n\n    todos = leftover_todos(root)\n    if missing:\n        WARN.append(\"内核缺失：\" + \"、\".join(missing) + \" —— 交接包不完整，先补齐内核再交接\")\n    elif todos:\n        WARN.append(\"内核未填完：\" + \"、\".join(f\"{f} 还有 {n} 处 TODO\" for f, n in todos))\n    else:\n        OK.append(\"内核三件套齐全且无遗留 TODO\")\n\n    keys = env_keys(read(os.path.join(root, \".env.example\")))\n    names = e3_names(root)\n\n    tools = read(os.path.join(root, \"TOOLS.md\")) or \"\"\n    repos = read(os.path.join(root, \"repos.md\")) or \"\"\n\n    now = datetime.datetime.now().strftime(\"%Y-%m-%d %H:%M\")\n    proj = os.path.basename(os.path.abspath(root))\n\n    L = []\n    A = L.append\n    A(f\"# HANDOFF — {proj}\\n\")\n    A(f\"> **导出时间**：{now}  \")\n    A(f\"> **导出者**：{author}  \")\n    A(f\"> **源**：MRS-EV 内核 v1.1 · 由 `scripts/handoff.py` 生成\\n\")\n    A(\"---\\n\")\n\n    # 0 引导\n    A(\"## 0. 引导（接手 Agent 先读这一节，再读别的）\\n\")\n    A(\"**你是接手方。开工前必须做到：**\\n\")\n    A(\"1. **按序读第 1 节**，顺序是 M → R → S，不要跳、不要并发读。\")\n    A(\"2. **第 1 节的 M 是不可违背的硬约束**，不是建议。与你的判断冲突时，以 M 为准。\")\n    A(\"3. **真值一律不在本包内。** 你只会看到 `E3_*` 引用名，值自己去 Vault 取。\")\n    A(\"4. **做完第 4 节的接手校验**，答不上就回问，不许猜。\\n\")\n    A(\"**一句话**：这是别人的项目，你是来接手的，不是来重新定义的。\\n\")\n    A(\"---\\n\")\n\n    # 1 内核\n    A(\"## 1. 内核 ●（原样搬运，不得改写）\\n\")\n    for fn, tag, desc in KERNEL:\n        body = read(os.path.join(root, fn))\n        A(f\"### ● {tag} —— {desc}　`{fn}`\\n\")\n        A(\"```markdown\")\n        A(fence(body, f\"（{fn} 缺失 —— 交接方未填写）\"))\n        A(\"```\\n\")\n    A(\"---\\n\")\n\n    # 2 外延\n    A(\"## 2. 外延 ○（只需知道存在，不必搬运）\\n\")\n    A(\"### ○ E1 公开\\n\")\n    A(fence(tools, \"（无 TOOLS.md）\") + \"\\n\")\n    A(fence(repos, \"（无 repos.md）\") + \"\\n\")\n    A(\"### ○ E2 配置（**只列键名，不给值**）\\n\")\n    if keys:\n        A(\"\\n\".join(f\"- `{k}`\" for k in keys) + \"\\n\")\n    else:\n        A(\"（`.env.example` 未定义键名）\\n\")\n    A(\"### ○ E3 凭证（**只列引用名，真值在 Vault**）\\n\")\n    if names:\n        A(\"| 引用名 | 说明 |\")\n        A(\"|---|---|\")\n        for n in names:\n            A(f\"| `{n}` | 见源项目 Readme.md 凭证引用表 |\")\n        A(\"\")\n    else:\n        A(\"（未发现 `E3_*` 引用名）\\n\")\n    A(\"> ⚠️ 本包**不含任何真值**。看到 `E3_*` 请去 Vault 取，不要问导出者要明文。\\n\")\n    A(\"---\\n\")\n\n    # 3 阻塞\n    A(\"## 3. 未决与阻塞\\n\")\n    A(\"### 阻塞（当前卡住的事）\\n\")\n    A(fence(blk, \"⚠️ 导出时未填写 —— 交接方补充后再发\") + \"\\n\")\n    A(\"### 下一步（紧接着要做的动作）\\n\")\n    A(fence(nxt, \"⚠️ 导出时未填写\") + \"\\n\")\n    A(\"---\\n\")\n\n    # 4 接手校验\n    A(\"## 4. 接手校验（必做）\\n\")\n    A(\"**读完本包后，你必须能回答这四个问题。任何一个答不上——回问导出者，不许猜，不许动手。**\\n\")\n    A(\"| # | 问题 | 答不上怎么办 |\")\n    A(\"|---|---|---|\")\n    A(\"| 1 | 这个项目是什么？为谁做？ | 重读第 1 节 M |\")\n    A(\"| 2 | 现在做到哪了？卡在哪？ | 快照过期 → 回问导出者 |\")\n    A(\"| 3 | 下一步具体做什么？（1–3 个动作） | 同上 |\")\n    A(\"| 4 | 我绝对不能碰什么？ | **禁止动手**，先问清边界 |\")\n    A(\"\")\n    A(\"**校验通过后，第一件事**：更新 `State.md` 的「下一步」，让下一个人知道你接住了。\\n\")\n    A(\"---\\n\")\n    A(\"> 本文件由 `scripts/handoff.py` 生成。手写必过期。规范见 `docs/交接协议.md`。\\n\")\n\n    return \"\\n\".join(L)\n\n\ndef main():\n    ap = argparse.ArgumentParser(description=\"生成 HANDOFF.md 单文件交接包\")\n    ap.add_argument(\"project\", nargs=\"?\", default=\".\", help=\"项目目录（默认当前目录）\")\n    ap.add_argument(\"-o\", \"--out\", default=None, help=\"输出路径（默认写到项目根 HANDOFF.md）\")\n    ap.add_argument(\"--author\", default=os.environ.get(\"USER\", \"未署名\"), help=\"导出者\")\n    ap.add_argument(\"--stdout\", action=\"store_true\", help=\"打到标准输出，方便直接粘贴\")\n    a = ap.parse_args()\n\n    root = os.path.abspath(a.project)\n    if not os.path.isdir(root):\n        print(f\"✗ 目录不存在: {root}\", file=sys.stderr)\n        sys.exit(1)\n\n    print(f\"→ 扫描 {root}\", file=sys.stderr)\n    doc = build(root, a.author)\n\n    print(\"\\n交接前自检:\", file=sys.stderr)\n    for o in OK:\n        say(\"✓\", o)\n    for w in WARN:\n        say(\"!\", w)\n    if not WARN:\n        say(\"✓\", \"无阻塞、无遗留 TODO —— 可以交接\")\n\n    if a.stdout:\n        sys.stdout.write(doc)\n        return\n\n    out = a.out or os.path.join(root, \"HANDOFF.md\")\n    with open(out, \"w\", encoding=\"utf-8\") as f:\n        f.write(doc)\n    size = os.path.getsize(out)\n    missing = [fn for fn, _, _ in KERNEL if read(os.path.join(root, fn)) is None]\n    print(f\"\\n✓ 已生成 {out}（{size} 字节，约 {size // 1024} KB）\", file=sys.stderr)\n    if missing:\n        print(\"✗ 但内核缺失，交接包不完整 —— 补齐后再交接。\", file=sys.stderr)\n        sys.exit(2)\n    print(\"  可直接粘贴给任何 Agent，或随项目一起发出。\", file=sys.stderr)\n\n\nif __name__ == \"__main__\":\n    main()\n"}, {"name": "Journal.md", "text": "# Journal.md —— 经验流水（只追加，不改历史）\n\n> 内核的**原料仓**。\n> 它**不参与日常决策** —— 挂载层里没有它，Agent 日常不读。\n> 加这一层，日常读取量一个字没变；它只在蒸馏时被翻出来。\n\n## 三条规矩\n\n1. **只追加。** 不修改、不删除任何历史条目 —— 改了就不叫流水账了。\n2. **写「为什么」，不写「做了什么」。** 前者能提炼出原则，后者不能。\n3. **标归类**：`M` / `S` / `E1`，给蒸馏脚本一个初判。\n\n## 条目格式\n\n```\n## YYYY-MM-DD #序号 一句话标题\n- 发生了什么：……\n- 为什么：……\n- 学到了什么：……\n- 归类：M / S / E1\n```\n\n## 蒸馏\n\n```bash\npython3 scripts/distill.py          # 扫流水 → 生成 CANDIDATES.md\n# 人工勾选要采纳的（改成 [x]）后再：\npython3 scripts/distill.py --apply  # 落入 Memory.md「熏修所得」\n```\n\n**判据**（详见 `docs/蒸馏机制.md`）：\n值得进 M = 可复用 ＋ 反直觉 ＋ 付出过代价 ＋ 不随环境变。\n\n**速判**：换一个全新的项目，这条还成立吗？成立 → M；不成立 → 留 S 或 E。\n\n---\n\n## 2026-01-01 #0 示例条目（正式使用前删掉这条）\n- 发生了什么：手写的 HANDOFF.md，三天后就跟实际进度对不上。\n- 为什么：状态是高频的，人不会每次同步；手写的必然过期。\n- 学到了什么：交接包必须是生成物，不能是手写件 —— 过期的交接包比没有更危险。\n- 归类：M\n"}, {"name": "scripts/distill.py", "text": "#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n\"\"\"\ndistill.py —— S→M 蒸馏：把经验流水（Journal.md）提炼成内核候选原则\n\n用法:\n    python3 scripts/distill.py                  # 生成 CANDIDATES.md\n    python3 scripts/distill.py --min 3          # 只提出现 >=3 次的\n    python3 scripts/distill.py --stdout         # 直接打到屏幕\n    python3 scripts/distill.py --apply          # 把 CANDIDATES.md 里勾选的落进 Memory.md\n\n设计原则:\n    Journal --distill--> CANDIDATES --人勾选--> Memory\n    脚本**绝不自动改内核**。M 为君，君的改动由人定夺。\n\"\"\"\n\nimport argparse\nimport datetime\nimport os\nimport re\nimport sys\n\n# 值得进 M 的信号词（反直觉 / 付出代价 / 可复用）\nSIGNAL = [\"踩坑\", \"返工\", \"纠正\", \"教训\", \"下次\", \"以后\", \"注意\", \"不要\", \"别再\",\n          \"总是\", \"又\", \"重复\", \"再犯\", \"应该\", \"必须\", \"问题\", \"失败\", \"错过\",\n          \"误以为\", \"其实\", \"才发现\"]\n# 一次性事实的信号词（不该进 M）\nNOISE = [\"本次\", \"这次临时\", \"当前版本\", \"目前用的是\"]\n\n\ndef read(p):\n    try:\n        with open(p, encoding=\"utf-8\") as f:\n            return f.read()\n    except FileNotFoundError:\n        return None\n\n\ndef say(t, m):\n    print(f\"  [{t}] {m}\", file=sys.stderr)\n\n\ndef grams(s, n=2):\n    \"\"\"字符 n-gram —— 没分词库时也能算中文相似度\"\"\"\n    s = re.sub(r\"[\\s，。、；：！？（）「」【】,.!?()\\-—]+\", \"\", s or \"\")\n    if len(s) < n:\n        return {s} if s else set()\n    return {s[i:i + n] for i in range(len(s) - n + 1)}\n\n\ndef sim(a, b):\n    A, B = grams(a), grams(b)\n    if not A or not B:\n        return 0.0\n    return len(A & B) / len(A | B)\n\n\ndef parse_entries(text):\n    \"\"\"解析 Journal.md 的条目\"\"\"\n    if not text:\n        return []\n    parts = re.split(r\"^## \", text, flags=re.M)[1:]\n    out = []\n    for p in parts:\n        head, _, body = p.partition(\"\\n\")\n        m = re.match(r\"(\\d{4}-\\d{2}-\\d{2})\\s*#(\\d+)\\s*(.+)\", head.strip())\n        if not m:\n            continue\n        date, no, title = m.group(1), int(m.group(2)), m.group(3).strip()\n        if \"已蒸馏\" in title:\n            title = title.replace(\"已蒸馏\", \"\").strip(\" []\")\n        if re.search(r\"状态\\s*[:：]\\s*已蒸馏\", body):\n            continue  # 已提炼过的跳过\n        learn = \"\"\n        kind = \"\"\n        topic = \"\"\n        for line in body.splitlines():\n            line = line.strip()\n            if line.startswith(\"- 学到了什么\"):\n                learn = line.split(\"：\", 1)[-1].split(\":\", 1)[-1].strip()\n            elif line.startswith(\"- 归类\"):\n                kind = line.split(\"：\", 1)[-1].split(\":\", 1)[-1].strip().upper()\n            elif line.startswith(\"- 主题\"):\n                topic = line.split(\"：\", 1)[-1].split(\":\", 1)[-1].strip()\n        out.append({\"date\": date, \"no\": no, \"title\": title, \"learn\": learn or title,\n                    \"kind\": kind, \"topic\": topic, \"body\": body})\n    return out\n\n\ndef cluster(entries, threshold=0.22):\n    \"\"\"聚类：先按「主题」硬性归并，再按相似度兜底。\n\n    为什么需要主题字段：语义相近但用词不同的两条（如「凭证进对话」与\n    「凭证要轮换」），纯字符相似度抓不住。让人给语义标签、机器只做机械\n    匹配 —— 人做判断，机器做执行。\n    \"\"\"\n    clusters = []\n    by_topic = {}\n    for e in entries:\n        if e[\"topic\"]:\n            by_topic.setdefault(e[\"topic\"], []).append(e)\n    for t, items in by_topic.items():\n        clusters.append({\"rep\": items[0], \"items\": list(items), \"topic\": t})\n\n    def best_match(e):\n        \"\"\"标题与正文取最大相似度 —— 标题往往更能代表主题\"\"\"\n        best, bs = None, 0.0\n        for c in clusters:\n            s = max(sim(e[\"title\"], c[\"rep\"][\"title\"]), sim(e[\"learn\"], c[\"rep\"][\"learn\"]))\n            if s > bs:\n                best, bs = c, s\n        return best, bs\n\n    for e in entries:\n        if e[\"topic\"]:\n            continue\n        c, s = best_match(e)\n        if c is not None and s >= threshold:\n            c[\"items\"].append(e)\n        else:\n            clusters.append({\"rep\": e, \"items\": [e], \"topic\": \"\"})\n    return clusters\n\n\ndef score(c):\n    \"\"\"打分：归类初判 + 信号词 + 频次\"\"\"\n    blob = \" \".join(i[\"learn\"] + \" \" + i[\"title\"] for i in c[\"items\"])\n    s = 0\n    if c[\"rep\"][\"kind\"].startswith(\"M\"):\n        s += 3\n    hits = sum(1 for w in SIGNAL if w in blob)\n    s += min(hits, 3)\n    n = len(c[\"items\"])\n    if n >= 3:\n        s += 3\n    elif n >= 2:\n        s += 2\n    if any(w in blob for w in NOISE):\n        s -= 2\n    if not c[\"rep\"][\"kind\"].startswith(\"M\") and not hits:\n        s -= 1\n    return s\n\n\ndef suggest(c):\n    \"\"\"建议去向\"\"\"\n    if c[\"rep\"][\"kind\"].startswith(\"E1\"):\n        return \"E1（外延·工具）\"\n    return \"S（留在状态）\" if score(c) < 3 else \"M（内核·原则）\"\n\n\ndef render(clusters, root, min_hits):\n    now = datetime.datetime.now().strftime(\"%Y-%m-%d %H:%M\")\n    scored = sorted(clusters, key=lambda c: -score(c))\n    strong = [c for c in scored if len(c[\"items\"]) >= 2 and suggest(c).startswith(\"M\")]\n    normal = [c for c in scored if len(c[\"items\"]) < 2 and suggest(c).startswith(\"M\")]\n    weak = [c for c in scored if not suggest(c).startswith(\"M\")]\n\n    L = []\n    A = L.append\n    A(\"# CANDIDATES —— 蒸馏候选（待人工拍板）\\n\")\n    A(f\"> **生成时间**：{now}  \")\n    A(f\"> **来源**：`Journal.md`（{sum(len(c['items']) for c in clusters)} 条）  \")\n    A(f\"> **判据**：可复用 ＋ 反直觉 ＋ 付出代价 ＋ 不随环境变\\n\")\n    A(\"> ⚠️ **脚本绝不自动改内核。** 勾选 `[x]` 后运行 `python3 scripts/distill.py --apply` 才落核。\\n\")\n    A(\"> **速判**：换一个全新项目，这条还成立吗？成立才勾。\\n\")\n    A(\"---\\n\")\n\n    def block(title, desc, cs):\n        A(f\"## {title}\\n\")\n        if desc:\n            A(f\"{desc}\\n\")\n        if not cs:\n            A(\"（无）\\n\")\n            return\n        for c in sorted(cs, key=lambda x: -score(x)):\n            n = len(c[\"items\"])\n            tag = f\"`出现 {n} 次`\" if n > 1 else \"`单次`\"\n            tgt = suggest(c)\n            A(f\"- [ ] **{c['rep']['title']}**　{tag}　`建议：{tgt}`\")\n            A(f\"  - 学到了什么：{c['rep']['learn']}\")\n            ev = \"、\".join(f\"#{i['no']}（{i['date']}）\" for i in c[\"items\"])\n            A(f\"  - 证据：{ev}\\n\")\n\n    block(\"强候选（重复出现 ≥2 次）\",\n          \"> **一次是意外，两次是模式，三次是原则。** 这些最该落核。\", strong)\n    block(\"一般候选\", None, normal)\n    block(\"不建议入核（留 S 或挂 E1）\",\n          \"> 一次性事实留 `State.md`；工具用法挂 `TOOLS.md`。\", weak)\n\n    A(\"---\\n\")\n    A(\"**勾选后**：`python3 scripts/distill.py --apply`\\n\")\n    return \"\\n\".join(L)\n\n\ndef apply_candidates(root):\n    \"\"\"把勾选项落入 Memory.md，并回写 Journal 标记\"\"\"\n    cand = read(os.path.join(root, \"CANDIDATES.md\"))\n    if not cand:\n        print(\"✗ 没有 CANDIDATES.md，先跑一次 distill.py\", file=sys.stderr)\n        sys.exit(1)\n    mem_path = os.path.join(root, \"Memory.md\")\n    mem = read(mem_path)\n    if mem is None:\n        print(\"✗ 没有 Memory.md，内核不存在\", file=sys.stderr)\n        sys.exit(1)\n\n    picked = [l.strip()[6:].strip() for l in cand.splitlines() if l.strip().startswith(\"- [x]\")]\n    picked = [re.sub(r\"\\*\\*|\\s+`[^`]*`\", \"\", p).strip() for p in picked]\n    if not picked:\n        print(\"· 没有勾选项，什么也没做。\", file=sys.stderr)\n        return\n\n    jpath = os.path.join(root, \"Journal.md\")\n    j = read(jpath)\n    now = datetime.datetime.now().strftime(\"%Y-%m-%d\")\n\n    # --- 1. 写入 Memory.md：插在最后一个 ## 标题之前，保证「最终定义」仍压轴 ---\n    lines = [f\"- **{t}**（{now} 蒸馏落核）\" for t in picked]\n    heads = list(re.finditer(r\"^## .*$\", mem, flags=re.M))\n    exist = re.search(r\"^## 熏修所得.*$\", mem, flags=re.M)\n    if exist:\n        nxt = re.search(r\"^## \", mem[exist.end():], flags=re.M)\n        end = exist.end() + (nxt.start() if nxt else len(mem) - exist.end())\n        mem = mem[:end].rstrip() + \"\\n\" + \"\\n\".join(lines) + \"\\n\" + mem[end:]\n    elif heads:\n        pos = heads[-1].start()\n        sec = \"## 熏修所得（S→M 蒸馏）\\n\\n\" + \"\\n\".join(lines) + \"\\n\\n\"\n        mem = mem[:pos] + sec + mem[pos:]\n    else:\n        mem = mem.rstrip() + \"\\n\\n## 熏修所得（S→M 蒸馏）\\n\\n\" + \"\\n\".join(lines) + \"\\n\"\n\n    # --- 2. 回写 Journal：对应条目标记已蒸馏，避免下次重复提炼 ---\n    marked = 0\n    if j:\n        blocks = re.split(r\"(^## [^\\n]*$)\", j, flags=re.M)\n        # blocks: ['', head1, body1, head2, body2, ...]\n        for i in range(1, len(blocks), 2):\n            head = blocks[i]\n            if any(t[:10] and t[:10] in head for t in picked):\n                body = blocks[i + 1] if i + 1 < len(blocks) else \"\"\n                if \"已蒸馏\" not in body:\n                    blocks[i + 1] = body.rstrip() + f\"\\n- 状态：已蒸馏（{now}）\\n\"\n                    marked += 1\n        j = \"\".join(blocks)\n\n    with open(mem_path, \"w\", encoding=\"utf-8\") as f:\n        f.write(mem)\n    if j:\n        with open(jpath, \"w\", encoding=\"utf-8\") as f:\n            f.write(j)\n\n    say(\"✓\", f\"已把 {len(picked)} 条写入 Memory.md「熏修所得」\")\n    say(\"✓\", f\"Journal 中 {marked} 条已标记「已蒸馏」，下次不再重复提炼\")\n    say(\"!\", \"请人工复核 Memory.md —— 落核即成硬约束，宁缺毋滥\")\n\n\ndef main():\n    ap = argparse.ArgumentParser(description=\"S→M 蒸馏：从 Journal.md 提炼内核候选\")\n    ap.add_argument(\"project\", nargs=\"?\", default=\".\", help=\"项目目录（默认当前）\")\n    ap.add_argument(\"--min\", type=int, default=1, help=\"最少出现次数（默认 1）\")\n    ap.add_argument(\"--threshold\", type=float, default=0.34, help=\"聚类相似度阈值\")\n    ap.add_argument(\"--stdout\", action=\"store_true\")\n    ap.add_argument(\"--apply\", action=\"store_true\", help=\"把勾选的候选落进 Memory.md\")\n    a = ap.parse_args()\n\n    root = os.path.abspath(a.project)\n    if a.apply:\n        apply_candidates(root)\n        return\n\n    j = read(os.path.join(root, \"Journal.md\"))\n    if j is None:\n        print(f\"✗ 没有 Journal.md —— 先建一个（模板见 template/Journal.md）\", file=sys.stderr)\n        sys.exit(1)\n\n    entries = parse_entries(j)\n    if not entries:\n        print(\"· Journal.md 里还没有条目。\", file=sys.stderr)\n        sys.exit(0)\n\n    clusters = cluster(entries, a.threshold)\n    clusters = [c for c in clusters if len(c[\"items\"]) >= a.min]\n\n    print(f\"→ 扫到 {len(entries)} 条流水，聚成 {len(clusters)} 类\", file=sys.stderr)\n    strong = sum(1 for c in clusters if len(c[\"items\"]) >= 2)\n    if strong:\n        say(\"!\", f\"{strong} 类重复出现 —— 这些是真信号，优先拍板\")\n\n    doc = render(clusters, root, a.min)\n    if a.stdout:\n        sys.stdout.write(doc)\n        return\n    out = os.path.join(root, \"CANDIDATES.md\")\n    with open(out, \"w\", encoding=\"utf-8\") as f:\n        f.write(doc)\n    print(f\"\\n✓ 已生成 {out}\", file=sys.stderr)\n    print(\"  勾选 [x] 后：`python3 scripts/distill.py --apply`\", file=sys.stderr)\n\n\nif __name__ == \"__main__\":\n    main()\n"}];
+/* ---- 极简 ZIP 打包（store 模式，无压缩）---- */
+const CRCT=(function(){const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRCT[(c^b[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+function buildZip(files){
+  const enc=new TextEncoder(), parts=[], central=[]; let offset=0;
+  const d=new Date();
+  const time=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1))&0xFFFF;
+  const date=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xFFFF;
+  files.forEach(f=>{
+    const nb=enc.encode(f.name), data=enc.encode(f.text), crc=crc32(data);
+    const lh=new Uint8Array(30+nb.length), v=new DataView(lh.buffer);
+    v.setUint32(0,0x04034b50,true); v.setUint16(4,20,true); v.setUint16(6,0,true); v.setUint16(8,0,true);
+    v.setUint16(10,time,true); v.setUint16(12,date,true); v.setUint32(14,crc,true);
+    v.setUint32(18,data.length,true); v.setUint32(22,data.length,true);
+    v.setUint16(26,nb.length,true); v.setUint16(28,0,true); lh.set(nb,30);
+    parts.push(lh,data);
+    const ch=new Uint8Array(46+nb.length), v2=new DataView(ch.buffer);
+    v2.setUint32(0,0x02014b50,true); v2.setUint16(4,20,true); v2.setUint16(6,20,true);
+    v2.setUint16(8,0,true); v2.setUint16(10,0,true); v2.setUint16(12,time,true); v2.setUint16(14,date,true);
+    v2.setUint32(16,crc,true); v2.setUint32(20,data.length,true); v2.setUint32(24,data.length,true);
+    v2.setUint16(28,nb.length,true); v2.setUint16(30,0,true); v2.setUint16(32,0,true);
+    v2.setUint16(34,0,true); v2.setUint16(36,0,true); v2.setUint32(38,0,true); v2.setUint32(42,offset,true);
+    ch.set(nb,46); central.push(ch);
+    offset+=lh.length+data.length;
+  });
+  const cdSize=central.reduce((a,b)=>a+b.length,0);
+  const eo=new Uint8Array(22), v3=new DataView(eo.buffer);
+  v3.setUint32(0,0x06054b50,true); v3.setUint16(4,0,true); v3.setUint16(6,0,true);
+  v3.setUint16(8,files.length,true); v3.setUint16(10,files.length,true);
+  v3.setUint32(12,cdSize,true); v3.setUint32(16,offset,true); v3.setUint16(20,0,true);
+  const all=parts.concat(central,[eo]);
+  const out=new Uint8Array(all.reduce((a,b)=>a+b.length,0)); let p=0;
+  all.forEach(u=>{out.set(u,p);p+=u.length;});
+  return out;
+}
+function makeZip(btn){
+  const blob=new Blob([buildZip(MRSEV_FILES)],{type:'application/zip'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='mrs-ev-template.zip'; a.click();
+  const old=btn.textContent; btn.textContent='✓ 已下载';
+  setTimeout(()=>btn.textContent=old,1800);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toggleFiles(btn){
+  const box=document.getElementById('fileList');
+  if(box.style.display!=='none'){box.style.display='none';btn.textContent='展开文件清单';return;}
+  box.innerHTML=MRSEV_FILES.map((f,i)=>
+    '<div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center">'+
+    '<b style="font-family:monospace;color:var(--acc)">'+esc(f.name)+'</b>'+
+    '<button class="cp" style="position:static" onclick="cpText('+i+',this)">复制</button></div>'+
+    '<pre id="f'+i+'" style="margin-top:10px;max-height:260px;overflow:auto">'+esc(f.text)+'</pre></div>'
+  ).join('');
+  box.style.display='block'; btn.textContent='收起文件清单';
+}
+function cpText(i,btn){
+  navigator.clipboard.writeText(MRSEV_FILES[i].text).then(()=>{
+    btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1600);});
+}
+</script>
+</body>
+</html>
