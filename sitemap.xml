@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- 站点主入口 -->
+  <url>
+    <loc>https://taiji.zheng-he.top/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 讲解页组 -->
+  <url>
+    <loc>https://taiji.zheng-he.top/deck/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://taiji.zheng-he.top/deck/digital.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://taiji.zheng-he.top/deck/practice.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://taiji.zheng-he.top/deck/handoff-lab.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- K 层橱窗：人读 -->
+  <url>
+    <loc>https://taiji.zheng-he.top/deck/k.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- K 层机器入口：AI 读 -->
+  <url>
+    <loc>https://taiji.zheng-he.top/k/index.json</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://taiji.zheng-he.top/llms.txt</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 答案型页面：直接回答提问，AI 答案抽取的高概率来源 -->
+  <url>
+    <loc>https://taiji.zheng-he.top/answers/wei-zhong-bloodletting.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+</urlset>
