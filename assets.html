@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>资产目录 · MRS-EV K 层</title>
+<meta name="description" content="MRS-EV 太极·点圆统一模型 K 层资产目录：橱窗 K_pub、货架 K_pri、私密 K_private，支持分类筛选与分页检索。">
+<link rel="canonical" href="https://taiji.zheng-he.top/assets.html">
+<link rel="alternate" type="text/plain" href="/llms.txt">
+<style>
+:root{
+  --bg:#0b1020;--bg2:#111a33;--card:#16203c;--tx:#e8eefc;--mut:#9db0d4;
+  --acc:#22d3ee;--acc2:#a78bfa;--line:rgba(255,255,255,.10);
+  --pub:#22d3ee;--pri:#fbbf24;--priv:#a78bfa;
+  --ok:#34d399;--warn:#fbbf24;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(1100px 700px at 15% -10%,#1a2450 0%,var(--bg) 55%) fixed;
+color:var(--tx);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+line-height:1.6;-webkit-text-size-adjust:100%}
+a{color:var(--acc);text-decoration:none}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px 64px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+h1{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:.5px}
+h1 .grad{background:linear-gradient(92deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.crumb{font-size:13px;color:var(--mut)}
+.crumb a{color:var(--mut)}
+.crumb a:hover{color:var(--acc)}
+.lead{color:var(--mut);font-size:14px;margin:6px 0 18px}
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;
+border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:600}
+.pill .dot{width:9px;height:9px;border-radius:50%}
+.pill.pub .dot{background:var(--pub)} .pill.pri .dot{background:var(--pri)} .pill.priv .dot{background:var(--priv)}
+.pill b{color:var(--tx)} .pill span{color:var(--mut);font-weight:500}
+
+/* filter bar (sticky) */
+.bar{position:sticky;top:0;z-index:20;background:rgba(11,16,32,.86);backdrop-filter:blur(10px);
+border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:22px;
+display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{cursor:pointer;padding:8px 15px;border-radius:10px;border:1px solid var(--line);
+background:var(--card);color:var(--mut);font-size:14px;font-weight:600;transition:.15s;white-space:nowrap}
+.tab:hover{color:var(--tx);border-color:var(--acc)}
+.tab.active{background:linear-gradient(160deg,var(--acc),var(--acc2));color:#06121f;border-color:transparent}
+.tab .n{opacity:.65;font-weight:500;margin-left:4px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.controls select,.controls input{background:var(--bg2);color:var(--tx);border:1px solid var(--line);
+border-radius:9px;padding:8px 11px;font-size:13.5px;font-family:inherit;outline:none}
+.controls select:focus,.controls input:focus{border-color:var(--acc)}
+.controls input[type=search]{flex:1;min-width:180px}
+.controls label{font-size:12.5px;color:var(--mut)}
+.hint{font-size:12.5px;color:var(--mut);margin-left:auto}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+.card{background:linear-gradient(165deg,var(--card),var(--bg2));border:1px solid var(--line);
+border-radius:15px;padding:17px 17px 15px;display:flex;flex-direction:column;gap:10px;
+position:relative;overflow:hidden;transition:.18s}
+.card:hover{transform:translateY(-3px);border-color:var(--acc);box-shadow:0 10px 30px -12px rgba(34,211,238,.35)}
+.card .lb{position:absolute;top:0;left:0;width:5px;height:100%}
+.card[data-layer="K_pub"] .lb{background:var(--pub)}
+.card[data-layer="K_pri"] .lb{background:var(--pri)}
+.card[data-layer="K_private"] .lb{background:var(--priv)}
+.crow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;letter-spacing:.3px}
+.badge.layer{color:#06121f}
+.badge.layer.K_pub{background:var(--pub)}
+.badge.layer.K_pri{background:var(--pri)}
+.badge.layer.K_private{background:var(--priv)}
+.badge.kind{background:rgba(255,255,255,.08);color:var(--mut);border:1px solid var(--line)}
+.badge.price{background:rgba(251,191,36,.16);color:var(--pri);border:1px solid rgba(251,191,36,.4)}
+.ctitle{font-size:16.5px;font-weight:700;line-height:1.35;color:var(--tx)}
+.csum{font-size:13.2px;color:var(--mut);line-height:1.65}
+.csum.clip{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.expand{cursor:pointer;font-size:12px;color:var(--acc);font-weight:600;align-self:flex-start}
+.ctags{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.chip{font-size:11.5px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.05);
+border:1px solid var(--line);color:var(--mut);cursor:pointer;transition:.15s}
+.chip:hover{color:var(--tx);border-color:var(--acc);background:rgba(34,211,238,.12)}
+.cfoot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;
+padding-top:9px;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
+.cfoot .id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;opacity:.75}
+
+/* pagination */
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:30px;flex-wrap:wrap}
+.pager button{min-width:38px;height:38px;padding:0 12px;border-radius:9px;border:1px solid var(--line);
+background:var(--card);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.pager button:hover:not(:disabled){border-color:var(--acc);color:var(--acc)}
+.pager button.active{background:linear-gradient(160deg,var(--acc),var(--acc2));color:#06121f;border-color:transparent}
+.pager button:disabled{opacity:.35;cursor:not-allowed}
+.pager .ellipsis{color:var(--mut);padding:0 4px}
+.pinfo{text-align:center;color:var(--mut);font-size:13px;margin-top:14px}
+.pagesize{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:12px;color:var(--mut);font-size:12.5px}
+.pagesize select{padding:5px 8px}
+
+/* empty */
+.empty{text-align:center;padding:60px 20px;color:var(--mut)}
+.empty .big{font-size:42px;margin-bottom:10px}
+
+/* footer */
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut);text-align:center}
+.foot a{color:var(--mut)}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.bar{position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1><span class="grad">资产目录</span> · K 层</h1>
+    <div class="crumb"><a href="/">taiji.zheng-he.top</a> / 资产目录</div>
+  </div>
+  <div class="lead">MRS-EV 太极·点圆统一上下文资产模型的知识资产清单。可按层级、类别、标签筛选，支持搜索与分页。</div>
+
+  <div class="pills" id="pills"></div>
+
+  <div class="bar">
+    <div class="tabs" id="tabs"></div>
+    <div class="controls">
+      <select id="kindSel" aria-label="类别筛选"><option value="">全部类别</option></select>
+      <select id="tagSel" aria-label="标签筛选"><option value="">全部标签</option></select>
+      <input type="search" id="search" placeholder="搜索标题 / 摘要 / 标签…" autocomplete="off">
+      <label>排序
+        <select id="sortSel">
+          <option value="new">最新优先</option>
+          <option value="title">标题 A→Z</option>
+          <option value="layer">按层级</option>
+        </select>
+      </label>
+      <span class="hint" id="hint"></span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none"><div class="big">∅</div>没有匹配的资产，试试调整筛选条件。</div>
+
+  <div class="pager" id="pager"></div>
+  <div class="pagesize">每页
+    <select id="psSel">
+      <option value="9">9</option>
+      <option value="12">12</option>
+      <option value="24">24</option>
+      <option value="999">全部</option>
+    </select> 件
+  </div>
+  <div class="pinfo" id="pinfo"></div>
+
+  <div class="foot">
+    本页为资产元数据目录（标题 / 摘要 / 标签 / 价签），不含资产正文。K_pri 货架内容在成交后注入。<br>
+    机器可读索引：<a href="/llms.txt">/llms.txt</a> · 返回 <a href="/">首页</a>
+  </div>
+</div>
+
+<script>
+const ASSETS = [{"id": "kpub-agents-md-convergence", "layer": "K_pub", "kind": "knowledge", "title": "AGENTS.md 标准收敛 —— 格式之争如何变成生态位重分配", "summary": "2026-09-18，Anthropic 在 Claude Code v2.1.277 中接入 AGENTS.md：若目录下无 CLAUDE.md，则回退读取 AGENTS.md。至此，Codex / Cursor / GitHub Copilot / Google Jules / Gemini CLI / Claude Code 六大主流 agent 首次共读同一份仓库级指令文件。此事常被误读为「Anthropic 低头」，实为**标准之争的收敛**：概念本是 Anthropic 用 CLAUDE.md 先普及的，2025-05 Sourcegraph 的 AMP 提议统一标准，OpenAI 买下 agents.md 域名抢占命名，AMP 让步，2025-12 OpenAI 将该规范捐给 Linux 基金会下的 Agentic AI Foundation（AAIF），60k+ 项目采用。", "tags": ["AGENTS.md", "标准收敛", "AI编程", "生态位", "Claude Code", "OpenAI Codex", "Linux基金会", "AAIF", "MCP", "Agent Skills", "跨工具", "K层", "入口战"], "price": null, "status": "live", "updated": "2026-10-04", "file": "pub/kpub-agents-md-convergence.json"}, {"id": "kpub-daodejing-ch1-guandao", "layer": "K_pub", "kind": "knowledge", "title": "《道德经》关道版 · 第一章：道可道也，非恒道也", "summary": "关道版第一章逐句串讲。核心论点：(1)'道'是本元及其衍生的一切特性与规律，'可道'之'可'本字是河流加口（求上天赐下真意、借人之口表述），意为'诚心至意全力去执行表达'，故能被说尽行尽的就不是本源之道；(2)'恒'非避讳改的'常'，恒=亙+亡（月亮可见面+不可见面），字里含阴阳、时空、内外、正背，故引申为'完备'；(3)命名是圣人才能干的活，'名可名也非恒名也'指一切命名皆不完备，以'牛顿发现万有引力'为例说明道与名的关系；(4)'无'=亡有（暂时隐藏，非没有），'有'=万物之母（母取怀孕之象）；(5)'谷'读爻，本义阴阳交合的端口，引申为缺陷、欲望；(6)'眇'观内（无），'曒'观外（有），是可在日常落地的智慧（画作颜料为例、中医藏象与未病已病）；(7)'玄'本义是黑丝线打的绳结，'玄之有玄，众眇之门'即'玄里面还有玄'这个显而易见的道理，是发现一切奥秘的必经门户。", "tags": ["道家", "道德经", "关道版", "第一章", "字源考据", "音义训读", "阴阳", "有无", "命名学", "中医", "量子理论"], "price": null, "status": "live", "updated": "2026-02-14", "file": "pub/kpub-daodejing-ch1-guandao.json"}, {"id": "kpub-daodejing-ch2-guandao", "layer": "K_pub", "kind": "knowledge", "title": "《道德经》关道版 · 第二章：美之为美，恶已", "summary": "关道版第二章逐句串讲。核心：(1)美=外在美（审美标准），善=内在美（行为标准）；'天下皆知美之为美'指各人各族审美各异，'之为美也'指刻意装扮或强求他人与己一致，'恶'读wù（厌恶），'已'是停止——这不是明智之举；(2)六对相生（有无、难易、长短、高下、音声、先后）是同一事物不同表现层面，合起来才全面反映该事物；音=众物共振（交响乐），声=单物振频；(3)关道把圣人分两类：天道圣人无偏颇心、维护整个自然乃至宇宙平衡；地道圣人有偏颇心、维护绝大多数人利益——本章说的是天道圣人；(4)'无为'不是什么都不做，而是该怎么做就怎么做，丢掉'刻意'的'妄为'，像呼吸心跳一样自然——'邯郸学步'是反面；(5)'不言之教'即不给出标准说教；'作而弗始/为而弗志/成而弗居'三层：不用既有'经验'标定初始、中间、结果，故'夫唯弗居，是以不去'。落到投资：'有道无术，尚可为之；有术无道，止于术矣'，经验主", "tags": ["道家", "道德经", "关道版", "第二章", "字源考据", "无为", "不言之教", "经验主义", "投资哲学", "天道圣人", "阴阳"], "price": null, "status": "live", "updated": "2026-02-14", "file": "pub/kpub-daodejing-ch2-guandao.json"}, {"id": "kpub-daodejing-ch3-guandao", "layer": "K_pub", "kind": "knowledge", "title": "《道德经》第三章「关道版」疏解 —— 坤阴之术：一套圣人治天下的柔性方略", "summary": "对《道德经》第三章的逐句疏解，采「关道版」文本。定位：第三章是第二章的延续，讲「术」—— 术分阴阳，本章是老子据**坤阴之道**给出的治天下之阴术（积极刚猛为阳术，柔和退让为阴术）。核心脉络：①「不上贤」反对的是给贤才抬高团体地位（上贤），而非不用贤（用贤）；老子主张「毋用」—— 有限度地用。②「不贵难得之货」是谏统御者勿凭主观喜好抬高稀有价值（区别于自然形成的「物以稀为贵」），涉及名与利的价值观导向。③「不见可欲」的「可欲」即前两句引起的名/利妄欲；关道本无「心」字，因上贤与贵货本身已是心乱之表现，多一心字则重复。④「虚其心，实其腹，弱其志，强其骨」是十二字治国方针：「弱」通「搦」——适度有力按压而非压制死（鱼潜鸟飞、物适其性）；「恒」本意为满月，引申周全完备。⑤「使民亡知亡欲」的「亡」是有选择地丢掉（非「无」）——该知的知、不该知的不知；「弗」是把他人意愿与自己意愿捆绑起来否定，故「弗", "tags": ["道德经", "老子", "道家", "关道版", "关尹子", "帝王术", "坤阴之术", "字源考据", "治国方略", "价值观导向", "国学"], "price": null, "status": "live", "updated": "2026-10-04", "file": "pub/kpub-daodejing-ch3-guandao.json"}, {"id": "kpub-daodejing-ch4-guandao", "layer": "K_pub", "kind": "K_pub", "title": "《道德经》第四章「关道版」疏解 —— 以字源与古礼制还原老子原意", "summary": "对《道德经》第四章的逐句疏解，采「关道版」文本。核心方法：回到甲骨文/金文字源与上古礼制，纠正通行版与后世成语化误读。主要结论有四：①「冲」是清浊二水交汇之中线，「用」是器实（装满）之意，「道，冲而用之，有弗盈也」是在讲道的阴阳/有无统一性与不可分割性；②「其」指代所作用的对象（外物），非指自己 —— 故「和光同尘」不是藏锋自修的境界，而是描述道能対外融通万物的功能；③「媅」（非「湛」）义为丰足持久带来的安逸安乐，即庄子所谓逍遥；④「象帝」出自上古以象牙占卜之礼，指能让象牙显纹的「天帝」（创世神），「象帝之先」谓道比创世神更早。全文用「始／母／宗／先」四字共同锁定道的最初、最元点特性。", "tags": ["道德经", "老子", "道家", "字源考据", "甲骨文", "古礼制", "易学", "帛书", "国学"], "price": null, "status": "live", "updated": "2026-10-02", "file": "pub/kpub-daodejing-ch4-guandao.json"}, {"id": "kpub-daodejing-ch5-guandao", "layer": "K_pub", "kind": "knowledge", "title": "《道德经》关道版 · 第五章：天地不仁，以万物为刍狗", "summary": "关道版第五章逐句串讲，全篇最关键的一句被误读最深。核心：(1)『仁』是人与人之间相互依存、需要对方认可才能成立的互补交互关系（告子'仁内也，义外也'；《礼记》'上下相亲谓之仁'）；天地不仁即天地从不主动付出、也不需要回报，用的是另一套法则——'皇天无亲，惟德是辅'，上天给的都一样，阳光雨露靠自己吸收。(2)『刍狗』不是猪狗畜生，而是刍物祭祀/刍灵，是生祭的代替，古人认为草扎之物同样有灵；天地视万物如刍灵，让其在自然界自由生息自化——刍灵成精要靠自己漫长自修。(3)『天地之间其猷囮篧与？虚而不淈。遑而俞出者多闻，数穷。不若兽于中。』囮é是捕鸟圆网、篧huò是捕鱼方篓，指天圆地方的天罗地网；猷是极狡猾难捕的小动物；俞出即想尽办法逃出；数穷即万事万物都无能为力。结论：不如『兽于中』——守住最最关键的位置。(4)『中』非几何中心，而是最恰当、可兼顾四方的关键点；又通'冲'；'兽'通'守'。(5)身", "tags": ["道家", "道德经", "关道版", "第五章", "字源考据", "仁", "刍狗", "囮篧", "兽于中", "守中", "中医学", "脑九宫", "胞中", "内乐", "道境", "祭祀"], "price": null, "status": "live", "updated": "2026-02-14", "file": "pub/kpub-daodejing-ch5-guandao.json"}, {"id": "kpub-daodejing-yinzi-guandao", "layer": "K_pub", "kind": "knowledge", "title": "《道德经》关道版 · 引子：让圣光重启", "summary": "关道版《老子五千言》领读笔记的开篇。核心命题：传统文化的根脉在天道，传承在人。文章把道德经的来历追到根上——从'河'即银河、汉族之'汉'亦指银河的训读起，串起上古传音通言（音重于形）、星书斗文、结绳记事、伏羲天索易、炎帝连山易、黄帝归藏易、仓颉造字、五帝递降、颛顼绝地天通、大禹九鼎，一直到老子做周太卜、携道西出函谷关、传道于喜（文始真人）而成五千言。结论：道德经是喜的家族两千余年传下的版本，是全人类经典，读它要用'天下的原则'，勿做巫师，要做归正本源的颛顼大帝，让圣光重启。", "tags": ["道家", "道德经", "关道版", "老子", "字源考据", "天道传承", "传统文化", "上古史", "文始真人", "版本学"], "price": null, "status": "live", "updated": "2026-02-14", "file": "pub/kpub-daodejing-yinzi-guandao.json"}, {"id": "kpub-discovery-layer-gap", "layer": "K_pub", "kind": "trace", "title": "试错记录 · 我以为做了 llms.txt 就等于被 AI 发现，2026-10 实测不是", "summary": "给委中放血那条资产补边界时，顺手查了自家出口的采纳现状，结果不太好：llms.txt 全网采用率约 10%（SE Ranking 分析 30 万域名），且去掉该变量后 AI 引用预测准确度反而上升；Google 搜索团队公开表态不支持、主要 AI 搜索爬虫直接绕过 llms.txt 抓 HTML。同时自查发现站点 schema.org 标记出现 0 次、无 robots.txt。**结论：llms.txt 是 B2A（对代理）基础设施，不是 GEO（被 AI 搜索引用）杠杆。** 我们此前把「有 llms.txt」当成发现层已完成，判错了。这是一次由自查触发的机制性纠错。", "tags": ["发现层", "llms.txt", "GEO", "B2A", "Schema.org", "JSON-LD", "robots.txt", "答案型页面", "FAQPage", "AI搜索", "AI引用", "被调用即存在", "K层", "自我纠错", "试错记录"], "price": null, "status": "live", "updated": "2026-10-06", "file": "pub/kpub-discovery-layer-gap.json"}, {"id": "kpub-hardcore-K", "layer": "K_pub", "kind": "K_pub", "title": "硬核资产（K）—— AI 入口时代占住流通端", "summary": "AI 接管调用入口后，问题从『抢流量』变成『怎样被 AI 调用』。答：得有一份结构化+索引化的知识资产。分两层：K_pub 橱窗（可见，让 AI 知道你）与 K_pri 货架（价签可见、内容不外露，成交后才交付）。推论：不能被机器检索的能力等于不存在；可被检索却未定价的私有资产等于送。", "tags": ["AI调用", "K_goods", "valid_until", "五层模板", "可证伪性", "定价", "成交", "时效", "橱窗", "流通端", "知识库", "货架", "边界"], "price": null, "status": "live", "updated": "2026-10-02", "file": "pub/kpub-hardcore-K.json"}, {"id": "kpub-live-compliance", "layer": "K_pub", "kind": "knowledge", "title": "直播准入与合规红线 —— 大学生开直播能做什么、不能做什么", "summary": "为「K_pri 首件做直播间形态」这一决策做的准入核实（2026-10-06）。结论分两层：**年龄不是障碍**（抖音/快手/B站 14-18 岁区间均可实名开播，普通直播 0 粉丝门槛）；**真正的门槛是内容类目**——医疗健康类目几乎全平台要求职业资质，且明文禁止「绝对化疗效用语」「未经验证的偏方古方」「高危且易被模仿的医疗内容详细教学步骤」。这直接决定了 K_pri 首件不应选健康赛道。另核实：微信视频号医疗类账号**禁止带货**，且健康科普资质需公立三甲在职医师。", "tags": ["直播", "准入", "合规", "实名认证", "年龄门槛", "医疗健康", "资质", "绝对化用语", "偏方", "平台规则", "视频号", "抖音", "快手", "B站", "K_pri", "形态选择", "红线"], "price": null, "status": "live", "updated": "2026-10-06", "file": "pub/kpub-live-compliance.json"}, {"id": "kpub-mrs-ev-model", "layer": "K_pub", "kind": "K_pub", "title": "MRS-EV 太极·点圆统一上下文资产模型", "summary": "一套可迁移的『上下文资产』组织方法：把组织一个智能体/项目所需的东西，拆成内核（M/R/S）+ 外延资源（E1/E2/E3）+ 硬核资产（K）+ 金库（Vault）。解决『换机换人不失忆』『安全地迁移内核』『让能力被 AI 调用』三类问题。", "tags": ["上下文工程", "智能体", "知识管理", "迁移", "太极模型", "MRS-EV", "内核", "资产"], "price": null, "status": "live", "updated": "2026-10-02", "file": "pub/kpub-mrs-ev-model.json"}, {"id": "kpub-outdoor-sketch-board-template", "layer": "K_pub", "kind": "goods", "title": "K_goods 首个实例 · 户外素描折叠画板（五层完整模板）", "summary": "K 层第一件『货』，也是第一个把五层清单跑通的完整样本。以户外素描折叠画板为对象，逐层给出可复制的结构：①发现层（实体卡/产品页标题公式/答案型页面/多平台引用源/AI 可读文件）②信任层（案例库/带图评价/硬参数/竞品对比/专家署名/风险承诺/更新日志）③成交层（报价表/预约询价/支付链接/合同发票/AI 客服话术/分销联盟/API-MCP）④履约层（物流模板/售后 SOP/使用教程/绑定内容/社群）⑤数据层（事件追踪/客户标签/A-B/归因/反馈回路）。核心洞见：『视频不是入口，是证据素材』『AI 买的是可验证的不确定性，不是断言』。**这是模板，不是真实商品**——参数为示例值，须换成你自己的实测数据。", "tags": ["K_goods", "模板", "五层", "发现层", "信任层", "成交层", "履约层", "数据层", "确定性", "可验证", "可证伪", "Schema", "API", "MCP", "户外写生", "画材", "实体卡", "答案型页面", "最小启动包"], "price": null, "status": "live", "updated": "2026-10-05", "file": "pub/kpub-outdoor-sketch-board-template.json"}, {"id": "kpub-skill-as-carrier", "layer": "K_pub", "kind": "knowledge", "title": "载体早已被市场选定：SKILL.md 是开放标准，且已有真实定价带（2026-10 实测）", "summary": "核实用户提供的第三条外部材料时撞见的硬事实，它把「载体选什么」这个问题从我们的选项清单上清空了：**Agent Skills 已于 2025-12-18 由 Anthropic 作为开放标准发布（agentskills.io），OpenAI Codex CLI（2025 底）、GitHub Copilot、Cursor、Windsurf、Gemini CLI 相继采用，同一份 SKILL.md 可在 14+ 工具中运行、无厂商锁定**。且它**不是免费的** —— 市场已形成明码标价带：PromptBase Claude Skills 类 $3.99–19.99（中位 $7.99，众数 $9.99，52 个定价条目）；Gumroad 同类约 $10–349、聚集 $39–49；KissMySkills 多数 skill $7、agent $19、bundle $16–99（2026-10-", "tags": ["载体选型", "SKILL.md", "Agent Skills", "agentskills.io", "开放标准", "14+ 工具", "无厂商锁定", "PromptBase", "Gumroad", "LemonSqueezy", "定价带", "marketplace 未上线", "分发先于产品", "受众才是资产", "虾聊", "Weilian", "Skills 无出路", "部分证伪", "K_pri", "首件", "编码偏好型 skill", "能力提升型 skill", "垂直专家编码型 skill", "护城河", "可复制性"], "price": null, "status": "live", "updated": "2026-10-06", "file": "pub/kpub-skill-as-carrier.json"}, {"id": "kpub-taiji-site", "layer": "K_pub", "kind": "K_pub", "title": "太极模型数字讲解站（20 页带配音）", "summary": "MRS-EV 模型的数字化讲解：20 页课件，每页配 AI 语音讲解与口型同步，另有练习页、交接实验页、数字版长页。是把抽象模型讲给人和机器听的可检索成品。", "tags": ["数字讲解", "课件", "演示", "TTS", "口型同步", "站点"], "price": null, "status": "live", "updated": "2026-10-02", "file": "pub/kpub-taiji-site.json"}, {"id": "kpub-trace-failures", "layer": "K_pub", "kind": "trace", "title": "试错记录 · 这套模型是怎么被一次次纠正的", "summary": "一份「迹」——不是成果展示，是这套模型在建的过程中真实踩过的坑、以及每次是谁把它拽回来的。包含：把「阶段」误写成静态概念被用户纠正、K 层擅自另开一条轴被用户驳回、表格页零块闸门两次救命、布局把网格撑成高柱、以及一次把数据出处记成 Forbes 实为 Ahrefs 的失真。每一条都附「当时怎么错、谁纠正、改成了什么」。这些是 AI 编不出来的，因为它们需要真实地在时间里承受过后果。", "tags": ["试错", "决策记录", "可验证", "反思", "方法论", "K_wit", "信任", "复盘"], "price": null, "status": "live", "updated": "2026-10-04", "file": "pub/kpub-trace-failures.json"}, {"id": "kpub-trace-seed-awakening", "layer": "K_pub", "kind": "trace", "title": "试错记录 · 我一直在做炼化炉，直到发现它是无源之水", "summary": "一份「迹」——记录一个创业者对自己多年路径的自我诊断。原话：「我一直在做炼化，做炼化炉。在炼化这个阶段里下功夫，考虑流通也少。后来才发现，任何东西都有炼化和流通两个阶段。现在才真正发现，你得先有自己的知识库。这是种子，然后你才能去炼化。这是在产生项目，然后它还能流通使用、发挥价值，这是一个三位一体的东西。以前光做了后面的，这是无源之水。所以要先有：一个 AI，再有知识库，才去考虑后面的炼化、流通使用。」—— 关键觉醒：把知识库（K）从『流通端的资产』重新认作『炼化端的种子』，即一切项目的上游。", "tags": ["试错", "决策记录", "炼化", "流通", "知识库", "种子", "三位一体", "无源之水", "自我诊断"], "price": null, "status": "live", "updated": "2026-10-04", "file": "pub/kpub-trace-seed-awakening.json"}, {"id": "kpub-two-phase", "layer": "K_pub", "kind": "K_pub", "title": "两阶：炼化 / 流通 + 分合节律", "summary": "任何价值活动都可拆成两段相位：炼化（原料→产品）与流通（产品→使用→交换→运输）。瓶颈在这两端之间轮换，谁占住当轮瓶颈那一端，谁收租 —— 收租权的转移，就是地主的更替。合与分不是两个状态，是永恒摆动的节律。", "tags": ["价值活动", "炼化", "流通", "瓶颈", "收租", "分合", "四代", "商业模型"], "price": null, "status": "live", "updated": "2026-10-02", "file": "pub/kpub-two-phase.json"}, {"id": "kpub-venue-lineage", "layer": "K_pub", "kind": "knowledge", "title": "场域三代：集市 → 商场 → 线上，变的不是形式是信任的来源", "summary": "用户口述的顿悟（2026-10-06）：交易场域沿集市、商场、线上三线演化，老的没死只是越来越弱；门头房是介于集市与商场之间的长期并存形态；顺风口则线上是主战场，知识库就建在云上即线上。本条在此基础上补三个推导：①三代真正变的是**信任的来源**（熟脸→资本担保→结构自证），商场的贵不是贵在地段，是贵在替顾客承担了风险；②内容变轻而结构必须变重，因为线下免费提供的地段/熟脸/被路过，线上必须自己造，这就是 boundaries 存在的理由；③**一个对 K 层不利的推论**——直播的胜利证明线上不是新场域而是集市形态的数字化，那么纯货架形态（我们的索引页与 JSON）恰是最难被自然发现的一种。本条落点：K_pri 首件应做成「直播间」形态而非「商品详情页」形态。", "tags": ["集市", "商场", "线上", "场域", "信任来源", "边际成本", "注意力", "K_pri", "形态选择", "可引用断言", "知识库", "云端", "两阶", "流通", "K层"], "price": null, "status": "live", "updated": "2026-10-06", "file": "pub/kpub-venue-lineage.json"}, {"id": "kpub-wei-zhong-bloodletting", "layer": "K_pub", "kind": "knowledge", "title": "倪海厦转述 · 委中穴放血与皮肤病（附强制边界）", "summary": "微信公众号「医道生活」2026-09-25 转述倪海厦讲皮肤病：主张「所有皮肤病在委中穴放血」，病机为「皮毛之病根在血分」，给出踮脚→拍打→刺血→拔罐的操作序列，附五条日常养护（出汗、少生冷甜腻、情绪平稳、勿乱用激素药膏、白色食物润肺）。本条入库**不是** endorsement：它是传统医学体系内部的陈述，非现代医学共识；含一句绝对化断言与一个有创操作，必须带边界引用。详见 boundaries。", "tags": ["中医", "医道", "委中穴", "放血", "腘窝", "郄穴", "膀胱经", "合穴", "皮肤病", "皮肤癣", "湿疹", "血分", "血毒", "肺主皮毛", "脾生湿", "湿热", "倪海厦", "医道生活", "公众号", "二次转述", "有创操作", "可证伪性", "K层"], "price": null, "status": "live", "updated": "2026-10-06", "file": "pub/kpub-wei-zhong-bloodletting.json"}, {"id": "kpri-shoujueyin-xinbaojing-bianzheng", "layer": "K_pri", "kind": "knowledge", "title": "手厥阴心包经辨证大全（十二经脉系列第二件 · K_pri 货架）", "summary": "用户以可成交货提供的《手厥阴心包辨证大全》（CamScanner 扫描图版 PDF，38 页，无文字层，图像精读 11 页）。内容体系：经脉循行（《灵枢·经脉》全文，心主手厥阴之脉起于胸中、出属心包络、下膈历络三焦，支脉别掌中循小指次指接手少阳三焦经）→ 内关络脉（实则心痛、虚则为头强）→ 本经 9 穴（天池·天泉·曲泽合·郄门郄·间使经·内关络·大陵输原·劳宫荥·中冲井）→ 是动则病 / 主脉所生病（手心热、臂肘挛急、腋肿、胸胁支满、心中憺憺大动、面赤目黄喜笑不休；烦心心痛掌中热）→ 五腧穴逐一详解（中冲井、劳宫荥、大陵输原、间使经、曲泽合，含部位、证治、针深壮数、按语）→ 心包络病候约 28 页辨证治疗（《灵枢·邪客》「诸邪之在于心者，皆在于心之包络」；神志失常虚/寒/热证、心痛、淋证小便异常、经脉所过部位疾患，各型附治则·遣经·用穴·针法）→ 特色配穴（曲泽镇静养心和胃降逆、大陵清包", "tags": ["中医", "针灸", "十二经脉", "手厥阴心包经", "辨证论治", "五腧穴", "中冲", "内关", "曲泽", "心痛", "神志失常", "巨灵针灸", "可成交知识资产", "K层"], "price": "¥10 / 2 USDC", "status": "live", "updated": "2026-10-09", "file": "pri/kpri-shoujueyin-xinbaojing-bianzheng.json"}, {"id": "kpri-zushaoyin-shenjing-bianzheng", "layer": "K_pri", "kind": "knowledge", "title": "足少阴肾经辨证大全（十二经脉系列首件 · K_pri 货架）", "summary": "用户以可成交货提供的《少阴肾经辨证大全》（CamScanner 扫描图版 PDF，59 页，无文字层，OCR + 前 4 页图像精读）。内容体系：经脉循行（《灵枢·经脉》全文）→ 大钟络脉 → 本经 27 穴（含经脉属性）与交会穴 → 是动则病 / 主肾所生病 → 五腧穴逐一详解（涌泉井、然谷荥、太溪输原、大钟络、水泉郄、照海、复溜经、交信、筑宾、阴谷合，含部位证治针方）→ 约 50 页辨证治疗（肾虚脑髓失养、恐惧、头痛巅疾、肾气不纳、腰痛、肾阳虚/阴虚、寒疝、遗精带下、月经不调、咽痛失音、水肿、泄泻肠澼、痿厥）。同属「古典巨灵经脉辩证」门派，与气血标靶笔记（太阴阳明大循环）、脾经/胃经辨证同源，对应其肾为先天之本的定位。已上架 K_pri 货架，按经脉计价 ¥10/2USDC，成交后注入完整内容，成交前仅露价签与摘要。含可照方施治的针灸内容，属最高级健康边界，详见 boundaries。", "tags": ["中医", "针灸", "十二经脉", "足少阴肾经", "辨证论治", "五腧穴", "涌泉", "太溪", "照海", "肾虚", "巨灵针灸", "可成交知识资产", "K层"], "price": "¥10 / 2 USDC", "status": "live", "updated": "2026-10-09", "file": "pri/kpri-zushaoyin-shenjing-bianzheng.json"}, {"id": "kprv-qixue-biaoba-notes", "layer": "K_private", "kind": "knowledge", "title": "高级班「气血标靶」针灸临床笔记（第2版，易飞编辑，20260909）· 私有临床资料蒸馏", "summary": "用户私有库提供的一份中医针灸高级班课堂笔记（第2版，易飞编辑，2026-09-09，约36万字/152图），体系名为「气血标靶」，属「巨灵针灸」师承脉络。核心是从气血角度切入辨证，以「治神针法」为根基，配套若干可复用的「基本盘」穴位数组（定神、脾阳虚中气不足、阴血虚等），再按病系分治（妇科/痛症/神志/脾胃/肺系等四十余节），并含巨灵刺、布气法、三套大循环针法、郄穴、导气法等子系统。本条是**结构化蒸馏与索引**，非全文转录；含整套可照方施治的针法，属高危健康内容，必须带强制边界。详见 boundaries。", "tags": ["中医", "针灸", "气血标靶", "巨灵针灸", "治神针法", "基本盘", "穴位数组", "三针", "同名经对应", "巨灵刺", "布气法", "大循环针法", "郄穴", "导气法", "灸法", "辨证论治", "阴虚", "阳虚", "私有临床笔记", "可证伪性", "K层"], "price": null, "status": "live", "updated": "2026-10-07", "file": "private/kprv-qixue-biaoba-notes.json"}, {"id": "kprv-zutaiyin-pijing-bianzheng", "layer": "K_private", "kind": "knowledge", "title": "足太阴脾经经脉辨证（古典巨灵针灸）· 私有临床资料蒸馏（十二经脉系列）", "summary": "用户私有库提供的《足太阴脾经经脉辨证大全》（PDF，37页，CamScanner扫描件、无文字层，经后台中文OCR+前3页图像精读蒸馏；页眉「古典巨灵经脉辩证」，与「巨灵针灸/气血标靶」同门）。结构：经脉循行（含脾之大络大包）→络脉公孙→是动则病/所生病→五腧穴（隐白/大都/太白/商丘/阴陵泉）→辨证治疗（脾虚、寒湿、脾不统血、心脾两虚、带下等）→配穴法（公孙八脉交会通冲脉、三阴交、俞募配穴）。第4页起细节由OCR初稿蒸馏，字符识别错漏多，引用具体数据必须对照原件。含可照方施治的针灸内容，属高危健康边界。", "tags": ["中医", "针灸", "十二经脉", "足太阴脾经", "辨证论治", "五腧穴", "公孙", "三阴交", "阴陵泉", "巨灵针灸", "古典巨灵", "OCR初稿", "私有临床资料", "K层"], "price": null, "status": "live", "updated": "2026-10-09", "file": "private/kprv-zutaiyin-pijing-bianzheng.json"}, {"id": "kprv-zuyangming-weijing-bianzheng", "layer": "K_private", "kind": "knowledge", "title": "足阳明胃经辨证大全 · 私有临床资料蒸馏（十二经脉系列）", "summary": "用户私有库提供的《足阳明胃经辨证大全》（docx，结构严谨：经脉循行→是动则病与所生病→五腧穴穴性→辨证与治疗→配穴法与注意事项）。五腧穴（厉兑/内庭/陷谷/冲阳/解溪/足三里）逐一给出部位、证治、针灸、按语；辨证治疗覆盖胃脘痛（虚/实/寒/热四型）、呕吐（虚/实/寒/热四型）、口眼喎斜，每型给辨证、遣经、用穴、配穴功能，可直接指导针灸操作。本条为结构化蒸馏与索引，非全文转录；含可照方施治的针灸内容，属高危健康边界，详见 boundaries。", "tags": ["中医", "针灸", "十二经脉", "足阳明胃经", "辨证论治", "五腧穴", "胃脘痛", "呕吐", "口眼喎斜", "俞募配穴", "八脉交会", "巨灵针灸", "私有临床资料", "K层"], "price": null, "status": "live", "updated": "2026-10-09", "file": "private/kprv-zuyangming-weijing-bianzheng.json"}];
+
+const LAYER_LABEL = {K_pub:"K_pub 橱窗", K_pri:"K_pri 货架", K_private:"私密 K_private"};
+const KIND_LABEL = {knowledge:"知识", K_pub:"体系", trace:"溯源", goods:"实物"};
+const KIND_ORDER = {knowledge:1, K_pub:2, trace:3, goods:4};
+
+// 归一化：kind 缺省成层名时归为“体系”
+function kindOf(a){ return (a.kind && a.kind!==a.layer) ? a.kind : (a.kind==="K_pub"?"K_pub":(a.kind||"knowledge")); }
+
+// 顶部分层计数 pill
+const counts = {K_pub:0,K_pri:0,K_private:0};
+ASSETS.forEach(a=>counts[a.layer]++);
+document.getElementById("pills").innerHTML = [
+  ['pub', counts.K_pub, 'K_pub 橱窗'],
+  ['pri', counts.K_pri, 'K_pri 货架'],
+  ['priv', counts.K_private, '私密']
+].map(([c,n,label])=>`<span class="pill ${c}"><span class="dot"></span><b>${n}</b><span>${label}</span></span>`).join('');
+
+// 状态
+const state = { layer:"", kind:"", tag:"", q:"", sort:"new", page:1, ps:9 };
+
+// 填充类别/标签下拉
+const kinds = [...new Set(ASSETS.map(kindOf))].sort((a,b)=>(KIND_ORDER[a]||9)-(KIND_ORDER[b]||9));
+const kindSel = document.getElementById("kindSel");
+kinds.forEach(k=>{ const o=document.createElement("option"); o.value=k; o.textContent=(KIND_LABEL[k]||k)+` (${ASSETS.filter(a=>kindOf(a)===k).length})`; kindSel.appendChild(o); });
+
+const tagsAll = {};
+ASSETS.forEach(a=>(a.tags||[]).forEach(t=>tagsAll[t]=(tagsAll[t]||0)+1));
+const tagSel = document.getElementById("tagSel");
+Object.entries(tagsAll).sort((a,b)=>b[1]-a[1]).forEach(([t,n])=>{
+  const o=document.createElement("option"); o.value=t; o.textContent=`${t} (${n})`; tagSel.appendChild(o);
+});
+
+// 分层 tab
+const tabsEl = document.getElementById("tabs");
+const tabs = [["","全部"],["K_pub","K_pub"],["K_pri","K_pri"],["K_private","私密"]];
+function renderTabs(){
+  tabsEl.innerHTML = tabs.map(([v,l])=>{
+    const n = v? counts[v] : ASSETS.length;
+    return `<div class="tab ${state.layer===v?'active':''}" data-v="${v}">${l}<span class="n">${n}</span></div>`;
+  }).join('');
+  tabsEl.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{ state.layer=t.dataset.v; state.page=1; renderTabs(); render(); });
+}
+
+function filtered(){
+  let r = ASSETS.slice();
+  if(state.layer) r = r.filter(a=>a.layer===state.layer);
+  if(state.kind)  r = r.filter(a=>kindOf(a)===state.kind);
+  if(state.tag)   r = r.filter(a=>(a.tags||[]).includes(state.tag));
+  if(state.q){ const q=state.q.toLowerCase();
+    r = r.filter(a=>(a.title+' '+(a.summary||'')+' '+(a.tags||[]).join(' ')).toLowerCase().includes(q)); }
+  if(state.sort==="new") r.sort((a,b)=>(b.updated||'').localeCompare(a.updated||''));
+  else if(state.sort==="title") r.sort((a,b)=>a.title.localeCompare(b.title,'zh'));
+  else if(state.sort==="layer") r.sort((a,b)=>(a.layer+b.title).localeCompare(b.layer+b.title,'zh'));
+  return r;
+}
+
+function cardHTML(a){
+  const k = kindOf(a);
+  const tags = (a.tags||[]).slice(0,6).map(t=>`<span class="chip" data-tag="${t}">${t}</span>`).join('');
+  const price = a.price ? `<span class="badge price">${a.price}</span>` : '';
+  const extra = a.layer==="K_pri" ? `<span class="badge kind">成交后交付</span>` : '';
+  const sum = a.summary ? `<div class="csum clip">${esc(a.summary)}</div><span class="expand">展开 ▾</span>` : '';
+  const id = a.id || a.file;
+  return `<div class="card" data-layer="${a.layer}">
+    <div class="lb"></div>
+    <div class="crow">
+      <span class="badge layer ${a.layer}">${LAYER_LABEL[a.layer]}</span>
+      <span class="badge kind">${KIND_LABEL[k]||k}</span>
+      ${price}${extra}
+    </div>
+    <div class="ctitle">${esc(a.title)}</div>
+    ${sum}
+    <div class="ctags">${tags}</div>
+    <div class="cfoot"><span class="id">${esc(id)}</span><span>${a.updated||''}</span></div>
+  </div>`;
+}
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function render(){
+  const r = filtered();
+  const total = r.length;
+  const ps = state.ps;
+  const pages = Math.max(1, Math.ceil(total/ps));
+  if(state.page>pages) state.page=pages;
+  const start = (state.page-1)*ps;
+  const slice = r.slice(start, start+ps);
+  const grid = document.getElementById("grid");
+  grid.innerHTML = slice.map(cardHTML).join('');
+  document.getElementById("empty").style.display = total? "none":"block";
+  document.getElementById("hint").textContent = `命中 ${total} 件`;
+
+  // 展开交互
+  grid.querySelectorAll('.expand').forEach(b=>b.onclick=()=>{
+    const c=b.parentElement; const s=c.querySelector('.csum');
+    if(s.classList.contains('clip')){ s.classList.remove('clip'); b.textContent='收起 ▴'; }
+    else { s.classList.add('clip'); b.textContent='展开 ▾'; }
+  });
+  // 标签点击筛选
+  grid.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+    const t=c.dataset.tag; state.tag=t; state.page=1; tagSel.value=t; render();
+  });
+
+  renderPager(pages,total,start,slice.length);
+}
+
+function renderPager(pages,total,start,n){
+  const pager=document.getElementById("pager");
+  if(total===0){ pager.innerHTML=''; document.getElementById("pinfo").textContent=''; return; }
+  let btns=[];
+  btns.push(`<button ${state.page===1?'disabled':''} data-p="${state.page-1}">‹</button>`);
+  const cur=state.page;
+  const win=[];
+  for(let p=1;p<=pages;p++){ if(p===1||p===pages||Math.abs(p-cur)<=2) win.push(p); else if(win[win.length-1]!=='…') win.push('…'); }
+  win.forEach(p=>{
+    if(p==='…') btns.push(`<span class="ellipsis">…</span>`);
+    else btns.push(`<button class="${p===cur?'active':''}" data-p="${p}">${p}</button>`);
+  });
+  btns.push(`<button ${state.page===pages?'disabled':''} data-p="${state.page+1}">›</button>`);
+  pager.innerHTML=btns.join('');
+  pager.querySelectorAll('button[data-p]').forEach(b=>b.onclick=()=>{ state.page=+b.dataset.p; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+  document.getElementById("pinfo").textContent = `第 ${state.page} / ${pages} 页 · 共 ${total} 件`;
+}
+
+// 事件
+document.getElementById("kindSel").onchange=e=>{state.kind=e.target.value;state.page=1;render();};
+document.getElementById("tagSel").onchange=e=>{state.tag=e.target.value;state.page=1;render();};
+document.getElementById("sortSel").onchange=e=>{state.sort=e.target.value;state.page=1;render();};
+document.getElementById("psSel").onchange=e=>{state.ps=+e.target.value;state.page=1;render();};
+let to; document.getElementById("search").oninput=e=>{clearTimeout(to);to=setTimeout(()=>{state.q=e.target.value.trim();state.page=1;render();},160);};
+
+renderTabs();
+render();
+</script>
+</body>
+</html>
